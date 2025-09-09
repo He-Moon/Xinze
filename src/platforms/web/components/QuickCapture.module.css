@@ -89,11 +89,61 @@
   min-width: 200px;
 }
 
-.submitButton {
+.recognizeButton {
   border-radius: var(--border-radius-md);
   height: 48px;
   font-size: var(--font-size-lg);
   font-weight: 500;
+}
+
+.resultCard {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  margin-top: var(--spacing-lg);
+}
+
+.editCard {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  margin-top: var(--spacing-lg);
+}
+
+.resultHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.aiIcon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.editItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  min-height: 32px;
+}
+
+.resultItem strong,
+.editItem strong {
+  min-width: 60px;
+  color: var(--text-color);
+}
+
+/* 按钮组样式 */
+.ant-space .ant-btn {
+  transition: all var(--motion-duration-mid) var(--motion-ease-in-out);
 }
 
 @media (max-width: 768px) {

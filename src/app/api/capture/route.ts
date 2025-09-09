@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthWithResponse } from '../../../lib/api-utils';
 
+interface AIRecognitionResult {
+  type: 'task' | 'goal' | 'principle';
+  summary: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 验证用户认证
@@ -131,4 +136,75 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// AI识别接口
+export async function PUT(request: NextRequest) {
+  try {
+    // 验证用户认证
+    const { user, errorResponse } = requireAuthWithResponse(request);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
+    const body = await request.json();
+    const { content } = body;
+
+    // 验证必填字段
+    if (!content || !content.trim()) {
+      return NextResponse.json(
+        { success: false, message: '内容不能为空' },
+        { status: 400 }
+      );
+    }
+
+    // 模拟AI识别延迟
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // 生成AI识别结果
+    const recognitionResult = generateAIRecognitionResult(content.trim());
+
+    return NextResponse.json({
+      success: true,
+      data: recognitionResult,
+      message: 'AI识别完成'
+    });
+
+  } catch (error) {
+    console.error('AI识别失败:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'AI识别失败，请稍后重试'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+// 生成AI识别结果的辅助函数
+function generateAIRecognitionResult(content: string): AIRecognitionResult {
+  const lowerContent = content.toLowerCase();
+  
+  // 简单的关键词匹配逻辑
+  let type: 'task' | 'goal' | 'principle' = 'task';
+  let summary = '';
+
+  // 类型识别
+  if (lowerContent.includes('目标') || lowerContent.includes('梦想') || lowerContent.includes('希望') || 
+      lowerContent.includes('想要') || lowerContent.includes('计划') || lowerContent.includes('愿景')) {
+    type = 'goal';
+  } else if (lowerContent.includes('原则') || lowerContent.includes('价值观') || lowerContent.includes('信念') ||
+             lowerContent.includes('理念') || lowerContent.includes('准则') || lowerContent.includes('信条')) {
+    type = 'principle';
+  }
+
+  // 生成摘要
+  const typeText = type === 'task' ? '任务' : type === 'goal' ? '目标' : '心则';
+  summary = `这是一个${typeText}，内容为：${content}`;
+
+  return {
+    type,
+    summary
+  };
 }

@@ -19,6 +19,11 @@ export interface CreateCaptureRequest {
   priority?: 'low' | 'medium' | 'high';
 }
 
+export interface AIRecognitionResult {
+  type: 'task' | 'goal' | 'principle';
+  summary: string;
+}
+
 export interface CaptureListResponse {
   captures: CaptureItem[];
   pagination: {
@@ -77,6 +82,11 @@ export class CaptureService {
   // 归档记录
   async archiveCapture(id: string): Promise<ApiResponse<CaptureItem>> {
     return await apiClient.put<CaptureItem>(`/capture/${id}`, { status: 'archived' });
+  }
+
+  // AI识别内容
+  async recognizeContent(content: string): Promise<ApiResponse<AIRecognitionResult>> {
+    return await apiClient.put<AIRecognitionResult>('/capture', { content });
   }
 }
 
