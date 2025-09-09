@@ -1,0 +1,91 @@
+/* Ant Design 自定义样式覆盖 - 使用自动生成的 CSS 变量 */
+
+/* 全局样式重置 */
+.ant-layout {
+  min-height: 100vh;
+}
+
+.ant-layout-content {
+  padding: var(--spacing-xl);
+}
+
+/* 按钮增强样式 - 添加微交互效果 */
+.ant-btn {
+  font-weight: 500;
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
+}
+
+.ant-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px var(--primary-color-light);
+}
+
+.ant-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 卡片增强样式 - 添加悬停效果 */
+.ant-card {
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
+}
+
+.ant-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* 输入框增强样式 - 改进焦点状态 */
+.ant-input:focus,
+.ant-input-affix-wrapper:focus {
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+  border-color: var(--primary-color-hover);
+}
+
+/* 选择器增强样式 - 改进交互状态 */
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border-color: var(--primary-color-hover);
+}
+
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-color: var(--primary-color-hover);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
+}
+
+/* 表格增强样式 - 改进悬停效果 */
+.ant-table-tbody > tr:hover > td {
+  background-color: var(--bg-color-layout);
+}
+
+/* 菜单增强样式 - 改进交互效果 */
+.ant-menu-item {
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
+}
+
+.ant-menu-item:hover {
+  background: linear-gradient(135deg, var(--bg-color-layout) 0%, var(--primary-color-light) 100%);
+  color: var(--primary-color);
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color-light) 100%);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* 响应式设计 - 移动端优化 */
+@media (max-width: var(--breakpoint-md)) {
+  .ant-layout-content {
+    padding: var(--spacing-lg);
+  }
+  
+  .ant-btn {
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+  }
+}
+
+@media (max-width: var(--breakpoint-xs)) {
+  .ant-layout-content {
+    padding: var(--spacing-md);
+  }
+}

@@ -1,0 +1,177 @@
+.container {
+  padding: var(--spacing-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size);
+}
+
+.content {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionCard {
+  margin-bottom: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionIcon {
+  color: var(--primary-color);
+  margin-right: var(--spacing-sm);
+  font-size: 20px;
+}
+
+.sectionTitle {
+  color: var(--text-color);
+  margin: 0 !important;
+}
+
+.profileSection {
+  padding: var(--spacing-md);
+  background-color: var(--bg-color-spotlight);
+  border-radius: var(--border-radius-md);
+}
+
+.avatarSection {
+  text-align: center;
+}
+
+.avatar {
+  margin-bottom: var(--spacing-md);
+  background-color: var(--primary-color);
+}
+
+.upload {
+  display: block;
+}
+
+.profileInfo {
+  text-align: left;
+}
+
+.profileName {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xs) !important;
+}
+
+.profileDescription {
+  color: var(--text-color-secondary);
+  margin-bottom: 0 !important;
+  font-style: italic;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+}
+
+.settingInfo {
+  flex: 1;
+}
+
+.settingTitle {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xs) !important;
+  font-size: 16px;
+}
+
+.settingSwitch {
+  flex-shrink: 0;
+}
+
+.settingSelect {
+  min-width: 150px;
+  flex-shrink: 0;
+}
+
+.dataActions {
+  padding: var(--spacing-md);
+  background-color: var(--bg-color-spotlight);
+  border-radius: var(--border-radius-md);
+}
+
+.dataActionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+}
+
+.dataActionInfo {
+  flex: 1;
+}
+
+.dataActionTitle {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xs) !important;
+  font-size: 16px;
+}
+
+.dataActionButton {
+  border-radius: var(--border-radius-md);
+  flex-shrink: 0;
+}
+
+.footer {
+  text-align: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.saveButton {
+  border-radius: var(--border-radius-md);
+  height: 48px;
+  font-size: var(--font-size);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .settingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .settingSwitch,
+  .settingSelect {
+    align-self: flex-end;
+  }
+  
+  .dataActionItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .dataActionButton {
+    align-self: flex-end;
+  }
+}

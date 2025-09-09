@@ -1,0 +1,153 @@
+.container {
+  padding: var(--spacing-lg);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size);
+}
+
+.tabs {
+  margin-bottom: var(--spacing-lg);
+}
+
+.content {
+  min-height: 400px;
+}
+
+.addSection {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-color-spotlight);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.addInput {
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size);
+}
+
+.addTextArea {
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+.addButton {
+  border-radius: var(--border-radius-md);
+  height: 40px;
+  font-weight: 500;
+}
+
+.goalsList,
+.principlesList {
+  margin-top: var(--spacing-lg);
+}
+
+.goalCard,
+.principleCard {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+  transition: all var(--motion-duration-mid);
+  width: 100%;
+}
+
+.goalCard:hover,
+.principleCard:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.goalHeader,
+.principleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.goalInfo,
+.principleInfo {
+  flex: 1;
+}
+
+.goalTitle {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.goalDescription {
+  color: var(--text-color-secondary);
+  margin-bottom: var(--spacing-md) !important;
+}
+
+.goalProgress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--primary-color);
+  transition: width var(--motion-duration-mid);
+}
+
+.principleContent {
+  color: var(--text-color);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.principleDate {
+  font-size: var(--font-size-xs);
+}
+
+.actionButton {
+  color: var(--text-color-tertiary);
+  flex-shrink: 0;
+}
+
+.actionButton:hover {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .goalHeader,
+  .principleHeader {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .goalInfo,
+  .principleInfo {
+    width: 100%;
+  }
+}

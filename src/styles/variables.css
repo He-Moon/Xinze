@@ -1,0 +1,144 @@
+/* 自动生成的 CSS 变量 - 请勿手动修改 */
+/* 此文件由 scripts/generate-css-variables.js 自动生成 */
+/* 如需修改，请编辑 src/lib/design-tokens.ts */
+
+:root {
+  /* 主色系 */
+  --primary-color: #333333;
+  --primary-color-hover: #555555;
+  --primary-color-active: #222222;
+  --primary-color-light: #f5f5f5;
+  
+  /* 功能色 */
+  --success-color: #4caf50;
+  --success-color-hover: #66bb6a;
+  --warning-color: #ff9800;
+  --warning-color-hover: #ffb74d;
+  --error-color: #f44336;
+  --error-color-hover: #ef5350;
+  --info-color: #2196f3;
+  --info-color-hover: #42a5f5;
+  
+  /* 文本色 */
+  --text-color: #333333;
+  --text-color-secondary: #666666;
+  --text-color-tertiary: #999999;
+  --text-color-quaternary: #cccccc;
+  --text-color-disabled: #cccccc;
+  
+  /* 背景色 */
+  --bg-color: #ffffff;
+  --bg-color-container: #ffffff;
+  --bg-color-elevated: #ffffff;
+  --bg-color-layout: #fafafa;
+  --bg-color-spotlight: #f5f5f5;
+  --bg-color-mask: rgba(0, 0, 0, 0.5);
+  
+  /* 边框色 */
+  --border-color: #e5e5e5;
+  --border-color-secondary: #f0f0f0;
+  --border-color-split: #f0f0f0;
+  
+  /* 间距系统 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+  
+  /* 圆角系统 */
+  --border-radius-none: 0px;
+  --border-radius-sm: 2px;
+  --border-radius-md: 4px;
+  --border-radius-lg: 8px;
+  --border-radius-round: 50%;
+  
+  /* 阴影系统 */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+  /* 字体系统 */
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  --font-size: 14px;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-xxl: 20px;
+  --line-height: 1.5;
+  --line-height-xs: 1.4;
+  --line-height-sm: 1.45;
+  --line-height-lg: 1.5;
+  --line-height-xl: 1.4;
+  --line-height-xxl: 1.3;
+  
+  /* 动画系统 */
+  --motion-duration-fast: 0.15s;
+  --motion-duration-mid: 0.2s;
+  --motion-duration-slow: 0.3s;
+  --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  
+  /* 断点系统 */
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1600px;
+  
+  /* 层级系统 */
+  --z-index-modal: 1000;
+  --z-index-popover: 1030;
+  --z-index-tooltip: 1060;
+  --z-index-notification: 1010;
+  --z-index-message: 1010;
+  --z-index-drawer: 1040;
+}
+
+/* 深色主题变量 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 深色主色系 */
+    --primary-color: #ffffff;
+    --primary-color-hover: #e0e0e0;
+    --primary-color-active: #f5f5f5;
+    --primary-color-light: #2a2a2a;
+    
+    /* 深色功能色 */
+    --success-color: #4caf50;
+    --success-color-hover: #66bb6a;
+    --warning-color: #ff9800;
+    --warning-color-hover: #ffb74d;
+    --error-color: #f44336;
+    --error-color-hover: #ef5350;
+    --info-color: #2196f3;
+    --info-color-hover: #42a5f5;
+    
+    /* 深色文本色 */
+    --text-color: #ffffff;
+    --text-color-secondary: #b3b3b3;
+    --text-color-tertiary: #808080;
+    --text-color-quaternary: #4d4d4d;
+    --text-color-disabled: #666666;
+    
+    /* 深色背景色 */
+    --bg-color: #1a1a1a;
+    --bg-color-container: #2a2a2a;
+    --bg-color-elevated: #333333;
+    --bg-color-layout: #000000;
+    --bg-color-spotlight: #2a2a2a;
+    --bg-color-mask: rgba(0, 0, 0, 0.7);
+    
+    /* 深色边框色 */
+    --border-color: #404040;
+    --border-color-secondary: #333333;
+    --border-color-split: #333333;
+  }
+}

@@ -1,0 +1,112 @@
+.container {
+  padding: var(--spacing-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size);
+}
+
+.inputCard {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.inputSection {
+  width: 100%;
+}
+
+.textArea {
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+}
+
+.textArea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.actionButton {
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+  color: var(--text-color-secondary);
+}
+
+.actionButton:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.selectionRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.typeSelection,
+.prioritySelection {
+  display: flex;
+  align-items: center;
+}
+
+.typeSelect,
+.prioritySelect {
+  min-width: 120px;
+}
+
+.tagsSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tagIcon {
+  color: var(--text-color-tertiary);
+  margin-right: var(--spacing-xs);
+}
+
+.tagsSelect {
+  min-width: 200px;
+}
+
+.submitButton {
+  border-radius: var(--border-radius-md);
+  height: 48px;
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .actionButton {
+    width: 100%;
+  }
+}

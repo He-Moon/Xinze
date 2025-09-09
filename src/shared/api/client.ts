@@ -1,0 +1,161 @@
+import { ApiResponse } from '../types';
+import { API_BASE_URL, AUTH_TOKEN_KEY } from '../constants';
+import { storage, handleApiError } from '../utils';
+import { authErrorHandler } from '../../lib/auth-error-handler';
+
+// HTTP客户端配置
+class ApiClient {
+  private baseURL: string;
+  private defaultHeaders: Record<string, string>;
+
+  constructor() {
+    this.baseURL = API_BASE_URL;
+    this.defaultHeaders = {
+      'Content-Type': 'application/json',
+    };
+  }
+
+  // 获取认证token
+  getAuthToken(): string | null {
+    return storage.get<string>(AUTH_TOKEN_KEY);
+  }
+
+  // 设置认证token
+  setAuthToken(token: string): void {
+    storage.set(AUTH_TOKEN_KEY, token);
+  }
+
+  // 清除认证token
+  clearAuthToken(): void {
+    storage.remove(AUTH_TOKEN_KEY);
+  }
+
+  // 构建请求头
+  private buildHeaders(customHeaders?: Record<string, string>): Record<string, string> {
+    const headers = { ...this.defaultHeaders, ...customHeaders };
+    const token = this.getAuthToken();
+    
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return headers;
+  }
+
+  // 处理响应
+  private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+    const data = await response.json();
+    
+    if (!response.ok) {
+      // 如果是401错误，使用认证错误处理器
+      if (response.status === 401) {
+        authErrorHandler.handleUnauthorized();
+      }
+      throw new Error(data.message || `HTTP ${response.status}`);
+    }
+    
+    return data;
+  }
+
+  // GET请求
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+    let url: string;
+    
+    // 处理相对路径和绝对路径
+    if (this.baseURL.startsWith('http')) {
+      // 绝对路径
+      const urlObj = new URL(`${this.baseURL}${endpoint}`);
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            urlObj.searchParams.append(key, String(value));
+          }
+        });
+      }
+      url = urlObj.toString();
+    } else {
+      // 相对路径
+      url = `${this.baseURL}${endpoint}`;
+      if (params) {
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            searchParams.append(key, String(value));
+          }
+        });
+        url += `?${searchParams.toString()}`;
+      }
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: this.buildHeaders(),
+      });
+      
+      return await this.handleResponse<T>(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // POST请求
+  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    try {
+      const url = this.buildUrl(endpoint);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: data ? JSON.stringify(data) : undefined,
+      });
+      
+      return await this.handleResponse<T>(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // PUT请求
+  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+    try {
+      const url = this.buildUrl(endpoint);
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: this.buildHeaders(),
+        body: data ? JSON.stringify(data) : undefined,
+      });
+      
+      return await this.handleResponse<T>(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // DELETE请求
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    try {
+      const url = this.buildUrl(endpoint);
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: this.buildHeaders(),
+      });
+      
+      return await this.handleResponse<T>(response);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  // 构建URL的辅助方法
+  private buildUrl(endpoint: string): string {
+    if (this.baseURL.startsWith('http')) {
+      return `${this.baseURL}${endpoint}`;
+    } else {
+      return `${this.baseURL}${endpoint}`;
+    }
+  }
+}
+
+// 导出单例实例
+export const apiClient = new ApiClient();
+export default apiClient;

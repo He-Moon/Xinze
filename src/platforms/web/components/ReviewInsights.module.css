@@ -1,0 +1,180 @@
+.container {
+  padding: var(--spacing-lg);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.subtitle {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size);
+}
+
+.content {
+  margin-bottom: var(--spacing-xl);
+}
+
+.sectionCard {
+  margin-bottom: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionIcon {
+  color: var(--primary-color);
+  margin-right: var(--spacing-sm);
+  font-size: 20px;
+}
+
+.sectionTitle {
+  color: var(--text-color);
+  margin: 0 !important;
+}
+
+.dailyStats,
+.weeklyStats {
+  margin-bottom: var(--spacing-lg);
+}
+
+.weekInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--bg-color-spotlight);
+  border-radius: var(--border-radius-md);
+}
+
+.insightsSection,
+.weeklyInsights {
+  margin-bottom: var(--spacing-lg);
+}
+
+.subsectionTitle {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-md) !important;
+}
+
+.insightsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.insightItem {
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-color-secondary);
+  position: relative;
+  padding-left: var(--spacing-lg);
+}
+
+.insightItem:last-child {
+  border-bottom: none;
+}
+
+.insightItem::before {
+  content: '•';
+  color: var(--primary-color);
+  position: absolute;
+  left: 0;
+  top: var(--spacing-sm);
+  font-size: 16px;
+}
+
+.principlesSection {
+  margin-top: var(--spacing-lg);
+}
+
+.principlesBox {
+  padding: var(--spacing-md);
+  background-color: var(--bg-color-spotlight);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color-secondary);
+  height: 100%;
+}
+
+.principlesTitle {
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm) !important;
+  font-size: 14px;
+}
+
+.principlesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.principleItem {
+  padding: var(--spacing-xs) 0;
+  position: relative;
+  padding-left: var(--spacing-md);
+}
+
+.principleItem::before {
+  content: '◦';
+  color: var(--text-color-tertiary);
+  position: absolute;
+  left: 0;
+  top: var(--spacing-xs);
+}
+
+.trendsSection {
+  margin-top: var(--spacing-lg);
+}
+
+.footer {
+  text-align: center;
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+}
+
+.actionButton {
+  border-radius: var(--border-radius-md);
+  height: 48px;
+  font-size: var(--font-size);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+  
+  .principlesBox {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .footer {
+    padding-top: var(--spacing-md);
+  }
+  
+  .actionButton {
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+  }
+}
