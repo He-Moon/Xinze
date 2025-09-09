@@ -1,12 +1,18 @@
-.layout {
-  min-height: 100vh;
+.fullScreenLayout {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
   background-color: var(--bg-color-layout);
+  overflow: hidden;
 }
 
 .sider {
   background-color: var(--bg-color);
   border-right: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .logo {
@@ -62,6 +68,14 @@
   background-color: var(--bg-color-spotlight);
 }
 
+.mainArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .header {
   background-color: var(--bg-color);
   border-bottom: 1px solid var(--border-color);
@@ -70,6 +84,8 @@
   justify-content: space-between;
   padding: 0 var(--spacing-lg);
   box-shadow: var(--shadow-sm);
+  height: 64px;
+  flex-shrink: 0;
 }
 
 .headerLeft {
@@ -118,10 +134,10 @@
 }
 
 .content {
-  padding: var(--spacing-lg);
+  flex: 1;
   background-color: var(--bg-color-layout);
-  min-height: calc(100vh - 64px);
   overflow-y: auto;
+  height: calc(100vh - 64px);
 }
 
 @media (max-width: 768px) {
@@ -131,12 +147,12 @@
     height: 100vh;
   }
   
-  .header {
-    padding: 0 var(--spacing-md);
+  .mainArea {
+    width: 100%;
   }
   
-  .content {
-    padding: var(--spacing-md);
+  .header {
+    padding: 0 var(--spacing-md);
   }
   
   .pageTitle {

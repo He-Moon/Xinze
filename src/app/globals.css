@@ -5,14 +5,35 @@
 /* 引入 Ant Design 自定义样式 */
 @import '../styles/antd-custom.css';
 
-/* 基础样式 */
+/* 重置所有默认样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
 body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   color: var(--text-color);
   background: var(--bg-color);
   font-family: var(--font-family);
   line-height: var(--line-height);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#__next {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* 滚动条样式 */

@@ -122,7 +122,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Layout className={styles.layout}>
+    <div className={styles.fullScreenLayout}>
       <Sider 
         trigger={null} 
         collapsible 
@@ -144,7 +144,7 @@ export default function Dashboard() {
         />
       </Sider>
       
-      <Layout>
+      <div className={styles.mainArea}>
         <Header className={styles.header}>
           <div className={styles.headerLeft}>
             <Button
@@ -174,10 +174,10 @@ export default function Dashboard() {
           </div>
         </Header>
         
-        <Content className={styles.content}>
+        <div className={styles.content}>
           {renderContent()}
-        </Content>
-      </Layout>
-    </Layout>
+        </div>
+      </div>
+    </div>
   );
 }
