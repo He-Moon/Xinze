@@ -47,9 +47,12 @@ class ApiClient {
     const data = await response.json();
     
     if (!response.ok) {
-      // 如果是401错误，使用认证错误处理器
+      // 只有401错误才跳转登录页
       if (response.status === 401) {
         authErrorHandler.handleUnauthorized();
+      } else {
+        // 其他错误只记录到控制台
+        console.error(`API Error ${response.status}:`, data);
       }
       throw new Error(data.message || `HTTP ${response.status}`);
     }

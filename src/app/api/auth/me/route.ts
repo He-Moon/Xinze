@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiResponse } from '@/shared/types';
 import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/jwt';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,17 +16,9 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7); // 移除 "Bearer " 前缀
     
-    // 简单的token验证（实际项目中应该使用JWT）
-    if (!token.startsWith('token_')) {
-      return NextResponse.json({
-        success: false,
-        message: '无效的token格式'
-      } as ApiResponse, { status: 401 });
-    }
-
-    // 从token中提取用户ID（简单实现）
-    const userId = token.split('_')[1];
-    if (!userId) {
+    // 使用JWT验证token
+    const payload = await verifyToken(token);
+    if (!payload) {
       return NextResponse.json({
         success: false,
         message: '无效的token'
@@ -34,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     // 查找用户
     const user = await prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: payload.userId }
     });
 
     if (!user) {

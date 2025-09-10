@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [selectedKey, setSelectedKey] = useState<MenuKey>('capture');
   const [collapsed, setCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const router = useRouter();
   const { message } = App.useApp();
 
@@ -59,6 +60,21 @@ export default function Dashboard() {
       cancelText: '取消',
       onOk: handleLogout,
     });
+  };
+
+  // 刷新任务列表
+  const handleTaskCreated = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // 刷新目标列表
+  const handleGoalCreated = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  // 刷新心则列表
+  const handlePrincipleCreated = () => {
+    setRefreshTrigger(prev => prev + 1);
   };
 
   const userMenuItems = [
@@ -107,17 +123,25 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (selectedKey) {
       case 'capture':
-        return <QuickCapture />;
+        return <QuickCapture 
+          onTaskCreated={handleTaskCreated} 
+          onGoalCreated={handleGoalCreated}
+          onPrincipleCreated={handlePrincipleCreated}
+        />;
       case 'today':
-        return <TodayView />;
+        return <TodayView refreshTrigger={refreshTrigger} />;
       case 'goals':
-        return <GoalsAndPrinciples />;
+        return <GoalsAndPrinciples refreshTrigger={refreshTrigger} />;
       case 'review':
         return <ReviewInsights />;
       case 'settings':
         return <Settings />;
       default:
-        return <QuickCapture />;
+        return <QuickCapture 
+          onTaskCreated={handleTaskCreated} 
+          onGoalCreated={handleGoalCreated}
+          onPrincipleCreated={handlePrincipleCreated}
+        />;
     }
   };
 

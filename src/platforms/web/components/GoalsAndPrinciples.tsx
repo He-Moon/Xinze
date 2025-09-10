@@ -1,100 +1,131 @@
 'use client';
 
-import { useState } from 'react';
-import { Tabs, Card, Button, Space, Typography, List, Tag, Empty, Input } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, BulbOutlined, TargetOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
+import { Tabs, Card, Button, Space, Typography, List, Tag, Empty, Input, Spin, message } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, BulbOutlined } from '@ant-design/icons';
+import { goalService, Goal } from '../../../shared/services/goalService';
+import { principleService, Principle } from '../../../shared/services/principleService';
 import styles from './GoalsAndPrinciples.module.css';
 
 const { TabPane } = Tabs;
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
-interface Goal {
-  id: string;
-  title: string;
-  description: string;
-  type: 'long-term' | 'stage' | 'sub';
-  status: 'active' | 'completed' | 'paused';
-  deadline?: string;
-  progress: number;
+interface GoalsAndPrinciplesProps {
+  refreshTrigger?: number;
 }
 
-interface Principle {
-  id: string;
-  content: string;
-  tags: string[];
-  source: 'personal' | 'quote' | 'insight';
-  createdAt: string;
-}
-
-export default function GoalsAndPrinciples() {
-  const [goals, setGoals] = useState<Goal[]>([
-    {
-      id: '1',
-      title: '提升专业技能',
-      description: '深入学习前端技术，掌握最新框架和工具',
-      type: 'long-term',
-      status: 'active',
-      deadline: '2024-12-31',
-      progress: 60
-    },
-    {
-      id: '2',
-      title: '完成项目重构',
-      description: '将现有项目迁移到新的技术栈',
-      type: 'stage',
-      status: 'active',
-      deadline: '2024-03-31',
-      progress: 30
-    }
-  ]);
-
-  const [principles, setPrinciples] = useState<Principle[]>([
-    {
-      id: '1',
-      content: '保持学习的心态，每天进步一点点',
-      tags: ['成长', '学习'],
-      source: 'personal',
-      createdAt: '2024-01-15'
-    },
-    {
-      id: '2',
-      content: '代码是写给人看的，不是写给机器看的',
-      tags: ['编程', '工作方式'],
-      source: 'quote',
-      createdAt: '2024-01-10'
-    }
-  ]);
+export default function GoalsAndPrinciples({ refreshTrigger }: GoalsAndPrinciplesProps) {
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [principles, setPrinciples] = useState<Principle[]>([]);
+  const [goalsLoading, setGoalsLoading] = useState(true);
+  const [principlesLoading, setPrinciplesLoading] = useState(true);
 
   const [newGoal, setNewGoal] = useState('');
   const [newPrinciple, setNewPrinciple] = useState('');
 
-  const handleAddGoal = () => {
-    if (newGoal.trim()) {
-      const goal: Goal = {
-        id: Date.now().toString(),
-        title: newGoal,
-        description: '',
-        type: 'long-term',
-        status: 'active',
-        progress: 0
-      };
-      setGoals([...goals, goal]);
-      setNewGoal('');
+  // 获取目标数据
+  const fetchGoals = async () => {
+    try {
+      setGoalsLoading(true);
+      console.log('🔍 开始获取目标数据...');
+      const response = await goalService.getActiveGoals();
+      console.log('📊 目标数据响应:', response);
+      if (response.success && response.data) {
+        setGoals(response.data.goals);
+        console.log('✅ 目标数据获取成功:', response.data.goals.length, '个目标');
+        console.log('📊 目标数据详情:', response.data.goals);
+      } else {
+        console.error('❌ 目标数据获取失败:', response);
+        message.error('获取目标失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取目标失败:', error);
+      message.error('获取目标失败，请稍后重试');
+    } finally {
+      setGoalsLoading(false);
     }
   };
 
-  const handleAddPrinciple = () => {
+  // 获取心则数据
+  const fetchPrinciples = async () => {
+    try {
+      setPrinciplesLoading(true);
+      console.log('🔍 开始获取心则数据...');
+      const response = await principleService.getAllPrinciples();
+      console.log('📊 心则数据响应:', response);
+      if (response.success && response.data) {
+        setPrinciples(response.data.principles);
+        console.log('✅ 心则数据获取成功:', response.data.principles.length, '个心则');
+      } else {
+        console.error('❌ 心则数据获取失败:', response);
+        message.error('获取心则失败');
+      }
+    } catch (error) {
+      console.error('❌ 获取心则失败:', error);
+      message.error('获取心则失败，请稍后重试');
+    } finally {
+      setPrinciplesLoading(false);
+    }
+  };
+
+  // 组件挂载时获取数据
+  useEffect(() => {
+    fetchGoals();
+    fetchPrinciples();
+  }, []);
+
+  // 监听刷新触发器
+  useEffect(() => {
+    if (refreshTrigger && refreshTrigger > 0) {
+      fetchGoals();
+      fetchPrinciples();
+    }
+  }, [refreshTrigger]);
+
+  const handleAddGoal = async () => {
+    if (newGoal.trim()) {
+      try {
+        const response = await goalService.createGoal({
+          title: newGoal.trim(),
+          description: '',
+          priority: 'medium'
+        });
+        
+        if (response.success) {
+          message.success('目标添加成功！');
+          setNewGoal('');
+          fetchGoals(); // 重新获取目标列表
+        } else {
+          message.error(response.message || '目标添加失败');
+        }
+      } catch (error) {
+        console.error('添加目标失败:', error);
+        message.error('添加目标失败，请稍后重试');
+      }
+    }
+  };
+
+  const handleAddPrinciple = async () => {
     if (newPrinciple.trim()) {
-      const principle: Principle = {
-        id: Date.now().toString(),
-        content: newPrinciple,
-        tags: [],
-        source: 'personal',
-        createdAt: new Date().toISOString().split('T')[0]
-      };
-      setPrinciples([...principles, principle]);
-      setNewPrinciple('');
+      try {
+        const response = await principleService.createPrinciple({
+          content: newPrinciple.trim(),
+          description: '',
+          weight: 5
+        });
+        
+        if (response.success) {
+          message.success('心则添加成功！');
+          setNewPrinciple('');
+          fetchPrinciples(); // 重新获取心则列表
+        } else {
+          message.error(response.message || '心则添加失败');
+        }
+      } catch (error) {
+        console.error('添加心则失败:', error);
+        message.error('添加心则失败，请稍后重试');
+      }
     }
   };
 
@@ -155,7 +186,12 @@ export default function GoalsAndPrinciples() {
             </div>
 
             <div className={styles.goalsList}>
-              {goals.length > 0 ? (
+              {goalsLoading ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Spin size="large" />
+                  <div style={{ marginTop: '16px' }}>加载目标中...</div>
+                </div>
+              ) : goals.length > 0 ? (
                 <List
                   dataSource={goals}
                   renderItem={(goal) => (
@@ -240,7 +276,12 @@ export default function GoalsAndPrinciples() {
             </div>
 
             <div className={styles.principlesList}>
-              {principles.length > 0 ? (
+              {principlesLoading ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Spin size="large" />
+                  <div style={{ marginTop: '16px' }}>加载心则中...</div>
+                </div>
+              ) : principles.length > 0 ? (
                 <List
                   dataSource={principles}
                   renderItem={(principle) => (

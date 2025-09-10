@@ -70,6 +70,7 @@ export const config = {
     '/api/capture/:path*', // 匹配capture及其子路径
     '/api/tasks/:path*',
     '/api/goals/:path*',
+    '/api/principles/:path*',
     '/api/ai/:path*',
   ],
 };

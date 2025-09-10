@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Input, Button, Card, Space, Typography, App, message, Divider, Tag, Select } from 'antd';
 import { PlusOutlined, RobotOutlined, EditOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { captureService, CreateCaptureRequest } from '../../../shared/services/captureService';
+import { taskService, CreateTaskRequest } from '../../../shared/services/taskService';
+import { goalService, CreateGoalRequest } from '../../../shared/services/goalService';
+import { principleService, CreatePrincipleRequest } from '../../../shared/services/principleService';
 import styles from './QuickCapture.module.css';
 
 const { TextArea } = Input;
@@ -15,7 +18,13 @@ interface AIRecognitionResult {
   summary: string;
 }
 
-export default function QuickCapture() {
+interface QuickCaptureProps {
+  onTaskCreated?: () => void;
+  onGoalCreated?: () => void;
+  onPrincipleCreated?: () => void;
+}
+
+export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrincipleCreated }: QuickCaptureProps) {
   const [content, setContent] = useState('');
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,26 +72,113 @@ export default function QuickCapture() {
       setIsAutoSaving(true);
       
       const finalResult = isEditing ? editedResult! : recognitionResult;
-      
-      const captureData: CreateCaptureRequest = {
-        content: content.trim(),
+      console.log('🔍 QuickCapture - 自动保存 - 最终识别结果:', finalResult);
+      console.log('🔍 QuickCapture - 自动保存 - 类型检查:', {
         type: finalResult.type,
-        tags: [],
-        priority: 'medium'
-      };
-
-      const result = await captureService.createCapture(captureData);
+        typeOf: typeof finalResult.type,
+        isTask: finalResult.type === 'task',
+        isGoal: finalResult.type === 'goal',
+        isPrinciple: finalResult.type === 'principle'
+      });
       
-      if (result.success) {
-        message.success('已自动保存！');
-        // 重置所有状态
-        setContent('');
-        setRecognitionResult(null);
-        setEditedResult(null);
-        setIsEditing(false);
-        setCountdown(10);
+      // 根据识别结果决定保存方式
+      if (finalResult.type === 'task') {
+        // 保存为任务
+        const taskData: CreateTaskRequest = {
+          title: content.trim(),
+          description: finalResult.summary,
+          type: 'task',
+          priority: 'medium'
+        };
+
+        const result = await taskService.createTask(taskData);
+        
+        if (result.success) {
+          message.success('任务已自动保存！');
+          // 通知父组件任务已创建
+          onTaskCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '任务保存失败');
+        }
+      } else if (finalResult.type === 'goal') {
+        // 保存为目标
+        const goalData: CreateGoalRequest = {
+          title: content.trim(),
+          description: finalResult.summary,
+          priority: 'medium'
+        };
+
+        console.log('🔍 QuickCapture - 创建目标数据:', goalData);
+        const result = await goalService.createGoal(goalData);
+        console.log('📊 QuickCapture - 目标创建响应:', result);
+        
+        if (result.success) {
+          message.success('目标已自动保存！');
+          // 通知父组件目标已创建
+          onGoalCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '目标保存失败');
+        }
+      } else if (finalResult.type === 'principle') {
+        // 保存为心则
+        console.log('🔍 QuickCapture - 自动保存 - 进入心则保存分支');
+        const principleData: CreatePrincipleRequest = {
+          content: content.trim(),
+          description: finalResult.summary,
+          weight: 5
+        };
+
+        console.log('🔍 QuickCapture - 创建心则数据:', principleData);
+        const result = await principleService.createPrinciple(principleData);
+        console.log('📊 QuickCapture - 心则创建响应:', result);
+        
+        if (result.success) {
+          message.success('心则已自动保存！');
+          // 通知父组件心则已创建
+          onPrincipleCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '心则保存失败');
+        }
       } else {
-        message.error(result.message || '自动保存失败');
+        // 保存为快速捕捉记录
+        const captureData: CreateCaptureRequest = {
+          content: content.trim(),
+          type: finalResult.type,
+          tags: [],
+          priority: 'medium'
+        };
+
+        const result = await captureService.createCapture(captureData);
+        
+        if (result.success) {
+          message.success('已自动保存！');
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '自动保存失败');
+        }
       }
     } catch (error) {
       console.error('自动保存失败:', error);
@@ -134,26 +230,109 @@ export default function QuickCapture() {
       }
       
       const finalResult = isEditing ? editedResult! : recognitionResult;
-      
-      const captureData: CreateCaptureRequest = {
-        content: content.trim(),
+      console.log('🔍 QuickCapture - 手动保存 - 最终识别结果:', finalResult);
+      console.log('🔍 QuickCapture - 手动保存 - 类型检查:', {
         type: finalResult.type,
-        tags: [],
-        priority: 'medium'
-      };
-
-      const result = await captureService.createCapture(captureData);
+        typeOf: typeof finalResult.type,
+        isTask: finalResult.type === 'task',
+        isGoal: finalResult.type === 'goal',
+        isPrinciple: finalResult.type === 'principle'
+      });
       
-      if (result.success) {
-        message.success('保存成功！');
-        // 重置所有状态
-        setContent('');
-        setRecognitionResult(null);
-        setEditedResult(null);
-        setIsEditing(false);
-        setCountdown(10);
+      // 根据识别结果决定保存方式
+      if (finalResult.type === 'task') {
+        // 保存为任务
+        const taskData: CreateTaskRequest = {
+          title: content.trim(),
+          description: finalResult.summary,
+          type: 'task',
+          priority: 'medium'
+        };
+
+        const result = await taskService.createTask(taskData);
+        
+        if (result.success) {
+          message.success('任务保存成功！');
+          // 通知父组件任务已创建
+          onTaskCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '任务保存失败');
+        }
+      } else if (finalResult.type === 'goal') {
+        // 保存为目标
+        const goalData: CreateGoalRequest = {
+          title: content.trim(),
+          description: finalResult.summary,
+          priority: 'medium'
+        };
+
+        const result = await goalService.createGoal(goalData);
+        
+        if (result.success) {
+          message.success('目标保存成功！');
+          // 通知父组件目标已创建
+          onGoalCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '目标保存失败');
+        }
+      } else if (finalResult.type === 'principle') {
+        // 保存为心则
+        console.log('🔍 QuickCapture - 手动保存 - 进入心则保存分支');
+        const principleData: CreatePrincipleRequest = {
+          content: content.trim(),
+          description: finalResult.summary,
+          weight: 5
+        };
+
+        const result = await principleService.createPrinciple(principleData);
+        
+        if (result.success) {
+          message.success('心则保存成功！');
+          // 通知父组件心则已创建
+          onPrincipleCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '心则保存失败');
+        }
       } else {
-        message.error(result.message || '保存失败');
+        // 保存为快速捕捉记录
+        const captureData: CreateCaptureRequest = {
+          content: content.trim(),
+          type: finalResult.type,
+          tags: [],
+          priority: 'medium'
+        };
+
+        const result = await captureService.createCapture(captureData);
+        
+        if (result.success) {
+          message.success('保存成功！');
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '保存失败');
+        }
       }
     } catch (error) {
       console.error('保存失败:', error);
@@ -186,25 +365,99 @@ export default function QuickCapture() {
         countdownRef.current = null;
       }
       
-      const captureData: CreateCaptureRequest = {
-        content: content.trim(),
-        type: editedResult.type,
-        tags: [],
-        priority: 'medium'
-      };
+      // 根据识别结果决定保存方式
+      if (editedResult.type === 'task') {
+        // 保存为任务
+        const taskData: CreateTaskRequest = {
+          title: content.trim(),
+          description: editedResult.summary,
+          type: 'task',
+          priority: 'medium'
+        };
 
-      const result = await captureService.createCapture(captureData);
-      
-      if (result.success) {
-        message.success('保存成功！');
-        // 重置所有状态
-        setContent('');
-        setRecognitionResult(null);
-        setEditedResult(null);
-        setIsEditing(false);
-        setCountdown(10);
+        const result = await taskService.createTask(taskData);
+        
+        if (result.success) {
+          message.success('任务保存成功！');
+          // 通知父组件任务已创建
+          onTaskCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '任务保存失败');
+        }
+      } else if (editedResult.type === 'goal') {
+        // 保存为目标
+        const goalData: CreateGoalRequest = {
+          title: content.trim(),
+          description: editedResult.summary,
+          priority: 'medium'
+        };
+
+        const result = await goalService.createGoal(goalData);
+        
+        if (result.success) {
+          message.success('目标保存成功！');
+          // 通知父组件目标已创建
+          onGoalCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '目标保存失败');
+        }
+      } else if (editedResult.type === 'principle') {
+        // 保存为心则
+        const principleData: CreatePrincipleRequest = {
+          content: content.trim(),
+          description: editedResult.summary,
+          weight: 5
+        };
+
+        const result = await principleService.createPrinciple(principleData);
+        
+        if (result.success) {
+          message.success('心则保存成功！');
+          // 通知父组件心则已创建
+          onPrincipleCreated?.();
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '心则保存失败');
+        }
       } else {
-        message.error(result.message || '保存失败');
+        // 保存为快速捕捉记录
+        const captureData: CreateCaptureRequest = {
+          content: content.trim(),
+          type: editedResult.type,
+          tags: [],
+          priority: 'medium'
+        };
+
+        const result = await captureService.createCapture(captureData);
+        
+        if (result.success) {
+          message.success('保存成功！');
+          // 重置所有状态
+          setContent('');
+          setRecognitionResult(null);
+          setEditedResult(null);
+          setIsEditing(false);
+          setCountdown(10);
+        } else {
+          message.error(result.message || '保存失败');
+        }
       }
     } catch (error) {
       console.error('保存失败:', error);

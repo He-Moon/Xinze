@@ -1,59 +1,91 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, Checkbox, Button, Space, Typography, Divider, Empty } from 'antd';
+import { useState, useEffect } from 'react';
+import { Card, Checkbox, Button, Space, Typography, Divider, Empty, Spin, message } from 'antd';
 import { ClockCircleOutlined, PlusOutlined, CheckOutlined, EditOutlined } from '@ant-design/icons';
 import styles from './TodayView.module.css';
+import { taskService, Task } from '../../../shared/services/taskService';
 
 const { Title, Text } = Typography;
 
-interface Task {
-  id: string;
-  title: string;
-  time?: string;
-  priority: 'high' | 'medium' | 'low';
-  completed: boolean;
-  type: 'scheduled' | 'priority';
+interface TodayViewProps {
+  refreshTrigger?: number;
 }
 
-export default function TodayView() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: '完成项目提案',
-      time: '09:00',
-      priority: 'high',
-      completed: false,
-      type: 'scheduled'
-    },
-    {
-      id: '2',
-      title: '团队会议',
-      time: '14:00',
-      priority: 'high',
-      completed: false,
-      type: 'scheduled'
-    },
-    {
-      id: '3',
-      title: '阅读技术文档',
-      priority: 'medium',
-      completed: false,
-      type: 'priority'
-    },
-    {
-      id: '4',
-      title: '整理工作笔记',
-      priority: 'low',
-      completed: true,
-      type: 'priority'
-    }
-  ]);
+export default function TodayView({ refreshTrigger }: TodayViewProps) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleTaskToggle = (id: string) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  // 获取任务数据
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await taskService.getTodayTasks();
+      if (response.success && response.data) {
+        setTasks(response.data.tasks);
+      } else {
+        message.error('获取任务失败');
+      }
+    } catch (error) {
+      console.error('获取任务失败:', error);
+      message.error('获取任务失败，请稍后重试');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 刷新任务数据
+  const refreshTasks = async () => {
+    try {
+      setRefreshing(true);
+      const response = await taskService.getTodayTasks();
+      if (response.success && response.data) {
+        setTasks(response.data.tasks);
+        message.success('任务已刷新');
+      } else {
+        message.error('刷新任务失败');
+      }
+    } catch (error) {
+      console.error('刷新任务失败:', error);
+      message.error('刷新任务失败，请稍后重试');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // 组件挂载时获取数据
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  // 监听刷新触发器
+  useEffect(() => {
+    if (refreshTrigger && refreshTrigger > 0) {
+      fetchTasks();
+    }
+  }, [refreshTrigger]);
+
+  const handleTaskToggle = async (id: string) => {
+    try {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      const newStatus = task.completed ? 'pending' : 'completed';
+      const response = await taskService.updateTask(id, { status: newStatus });
+      
+      if (response.success) {
+        setTasks(tasks.map(task => 
+          task.id === id ? { ...task, completed: !task.completed, status: newStatus } : task
+        ));
+        message.success(task.completed ? '任务已标记为未完成' : '任务已完成');
+      } else {
+        message.error('更新任务状态失败');
+      }
+    } catch (error) {
+      console.error('更新任务状态失败:', error);
+      message.error('更新任务状态失败，请稍后重试');
+    }
   };
 
   const handleAddTask = () => {
@@ -66,22 +98,50 @@ export default function TodayView() {
     console.log('开始复盘');
   };
 
-  const scheduledTasks = tasks.filter(task => task.type === 'scheduled' && !task.completed);
-  const priorityTasks = tasks.filter(task => task.type === 'priority' && !task.completed);
+  // 根据优先级和状态分类任务
+  const scheduledTasks = tasks.filter(task => 
+    task.priority === 'high' && !task.completed && task.status === 'pending'
+  );
+  const priorityTasks = tasks.filter(task => 
+    (task.priority === 'medium' || task.priority === 'low') && !task.completed && task.status === 'pending'
+  );
   const completedTasks = tasks.filter(task => task.completed);
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <Spin size="large" />
+          <Text>加载任务中...</Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Title level={2} className={styles.title}>今日任务</Title>
-        <Text className={styles.subtitle}>
-          {new Date().toLocaleDateString('zh-CN', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            weekday: 'long'
-          })}
-        </Text>
+        <div className={styles.headerContent}>
+          <div>
+            <Title level={2} className={styles.title}>今日任务</Title>
+            <Text className={styles.subtitle}>
+              {new Date().toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+              })}
+            </Text>
+          </div>
+          <Button
+            type="text"
+            onClick={refreshTasks}
+            loading={refreshing}
+            className={styles.refreshButton}
+          >
+            刷新
+          </Button>
+        </div>
       </div>
 
       <div className={styles.content}>
@@ -103,7 +163,9 @@ export default function TodayView() {
                     />
                     <div className={styles.taskInfo}>
                       <Text className={styles.taskTitle}>{task.title}</Text>
-                      <Text className={styles.taskTime}>{task.time}</Text>
+                      {task.description && (
+                        <Text className={styles.taskDescription}>{task.description}</Text>
+                      )}
                     </div>
                     <Button
                       type="text"
@@ -135,6 +197,9 @@ export default function TodayView() {
                     />
                     <div className={styles.taskInfo}>
                       <Text className={styles.taskTitle}>{task.title}</Text>
+                      {task.description && (
+                        <Text className={styles.taskDescription}>{task.description}</Text>
+                      )}
                       <Text className={`${styles.taskPriority} ${styles[`priority-${task.priority}`]}`}>
                         {task.priority === 'high' ? '高' : task.priority === 'medium' ? '中' : '低'}
                       </Text>
@@ -169,6 +234,9 @@ export default function TodayView() {
                     />
                     <div className={styles.taskInfo}>
                       <Text className={styles.taskTitle}>{task.title}</Text>
+                      {task.description && (
+                        <Text className={styles.taskDescription}>{task.description}</Text>
+                      )}
                     </div>
                   </div>
                 </Card>

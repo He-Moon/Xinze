@@ -39,8 +39,12 @@ export class AuthErrorHandler {
 
   // 处理认证错误
   handleAuthError(error: any): void {
-    if (error?.message?.includes('401') || error?.status === 401) {
+    // 只有明确的401错误才跳转登录页
+    if (error?.status === 401 || error?.response?.status === 401) {
       this.handleUnauthorized();
+    } else {
+      // 其他错误只打印到控制台，不跳转
+      console.error('API Error (not 401):', error);
     }
   }
 

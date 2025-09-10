@@ -163,6 +163,8 @@ export async function PUT(request: NextRequest) {
 
     // 生成AI识别结果
     const recognitionResult = generateAIRecognitionResult(content.trim());
+    console.log('🔍 AI识别 - 输入内容:', content.trim());
+    console.log('🔍 AI识别 - 识别结果:', recognitionResult);
 
     return NextResponse.json({
       success: true,
@@ -192,10 +194,14 @@ function generateAIRecognitionResult(content: string): AIRecognitionResult {
 
   // 类型识别
   if (lowerContent.includes('目标') || lowerContent.includes('梦想') || lowerContent.includes('希望') || 
-      lowerContent.includes('想要') || lowerContent.includes('计划') || lowerContent.includes('愿景')) {
+      lowerContent.includes('想要') || lowerContent.includes('计划') || lowerContent.includes('愿景') ||
+      lowerContent.includes('学习') || lowerContent.includes('掌握') || lowerContent.includes('提升') ||
+      lowerContent.includes('成为') || lowerContent.includes('实现') || lowerContent.includes('达到')) {
     type = 'goal';
   } else if (lowerContent.includes('原则') || lowerContent.includes('价值观') || lowerContent.includes('信念') ||
-             lowerContent.includes('理念') || lowerContent.includes('准则') || lowerContent.includes('信条')) {
+             lowerContent.includes('理念') || lowerContent.includes('准则') || lowerContent.includes('信条') ||
+             lowerContent.includes('感觉') || lowerContent.includes('感悟') || lowerContent.includes('体会') ||
+             lowerContent.includes('心得') || lowerContent.includes('启发') || lowerContent.includes('智慧')) {
     type = 'principle';
   }
 

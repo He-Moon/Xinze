@@ -8,8 +8,31 @@
 }
 
 .header {
-  text-align: center;
   margin-bottom: var(--spacing-xl);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.refreshButton {
+  color: var(--text-color-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.refreshButton:hover {
+  color: var(--primary-color);
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: var(--spacing-md);
 }
 
 .title {
@@ -99,9 +122,11 @@
   color: var(--text-color-tertiary);
 }
 
-.taskTime {
+.taskDescription {
   color: var(--text-color-secondary);
   font-size: var(--font-size-sm);
+  line-height: var(--line-height);
+  margin-top: 2px;
 }
 
 .taskPriority {
