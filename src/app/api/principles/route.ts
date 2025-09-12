@@ -103,7 +103,13 @@ export async function POST(request: NextRequest) {
         name: content.trim(), // 使用 name 字段存储内容
         description: description?.trim(),
         weight: Math.min(Math.max(weight, 1), 10), // 限制权重在 1-10 之间
-        userId
+        userId,
+        // AI分析信息
+        aiType: body.aiType,
+        aiSummary: body.aiSummary,
+        aiConfidence: body.aiConfidence,
+        aiReasoning: body.aiReasoning,
+        aiModel: body.aiModel
       }
     });
 

@@ -22,6 +22,12 @@ export interface CreateTaskRequest {
   content?: string;
   type?: 'task' | 'idea' | 'link';
   priority?: 'low' | 'medium' | 'high';
+  // AI分析信息
+  aiType?: string;
+  aiSummary?: string;
+  aiConfidence?: number;
+  aiReasoning?: string;
+  aiModel?: string;
 }
 
 export interface UpdateTaskRequest {

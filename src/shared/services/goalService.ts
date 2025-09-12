@@ -18,6 +18,12 @@ export interface CreateGoalRequest {
   title: string;
   description?: string;
   priority?: 'low' | 'medium' | 'high';
+  // AI分析信息
+  aiType?: string;
+  aiSummary?: string;
+  aiConfidence?: number;
+  aiReasoning?: string;
+  aiModel?: string;
 }
 
 export interface UpdateGoalRequest {

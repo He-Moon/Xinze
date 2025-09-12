@@ -16,6 +16,8 @@ const { Option } = Select;
 interface AIRecognitionResult {
   type: 'task' | 'goal' | 'principle';
   summary: string;
+  confidence?: number;
+  reasoning?: string;
 }
 
 interface QuickCaptureProps {
@@ -159,25 +161,25 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
         }
       } else {
         // 保存为快速捕捉记录
-        const captureData: CreateCaptureRequest = {
-          content: content.trim(),
-          type: finalResult.type,
-          tags: [],
-          priority: 'medium'
-        };
+      const captureData: CreateCaptureRequest = {
+        content: content.trim(),
+        type: finalResult.type,
+        tags: [],
+        priority: 'medium'
+      };
 
-        const result = await captureService.createCapture(captureData);
-        
-        if (result.success) {
-          message.success('已自动保存！');
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '自动保存失败');
+      const result = await captureService.createCapture(captureData);
+      
+      if (result.success) {
+        message.success('已自动保存！');
+        // 重置所有状态
+        setContent('');
+        setRecognitionResult(null);
+        setEditedResult(null);
+        setIsEditing(false);
+        setCountdown(10);
+      } else {
+        message.error(result.message || '自动保存失败');
         }
       }
     } catch (error) {
@@ -313,25 +315,25 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
         }
       } else {
         // 保存为快速捕捉记录
-        const captureData: CreateCaptureRequest = {
-          content: content.trim(),
-          type: finalResult.type,
-          tags: [],
-          priority: 'medium'
-        };
+      const captureData: CreateCaptureRequest = {
+        content: content.trim(),
+        type: finalResult.type,
+        tags: [],
+        priority: 'medium'
+      };
 
-        const result = await captureService.createCapture(captureData);
-        
-        if (result.success) {
-          message.success('保存成功！');
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '保存失败');
+      const result = await captureService.createCapture(captureData);
+      
+      if (result.success) {
+        message.success('保存成功！');
+        // 重置所有状态
+        setContent('');
+        setRecognitionResult(null);
+        setEditedResult(null);
+        setIsEditing(false);
+        setCountdown(10);
+      } else {
+        message.error(result.message || '保存失败');
         }
       }
     } catch (error) {
@@ -438,25 +440,25 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
         }
       } else {
         // 保存为快速捕捉记录
-        const captureData: CreateCaptureRequest = {
-          content: content.trim(),
-          type: editedResult.type,
-          tags: [],
-          priority: 'medium'
-        };
+      const captureData: CreateCaptureRequest = {
+        content: content.trim(),
+        type: editedResult.type,
+        tags: [],
+        priority: 'medium'
+      };
 
-        const result = await captureService.createCapture(captureData);
-        
-        if (result.success) {
-          message.success('保存成功！');
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '保存失败');
+      const result = await captureService.createCapture(captureData);
+      
+      if (result.success) {
+        message.success('保存成功！');
+        // 重置所有状态
+        setContent('');
+        setRecognitionResult(null);
+        setEditedResult(null);
+        setIsEditing(false);
+        setCountdown(10);
+      } else {
+        message.error(result.message || '保存失败');
         }
       }
     } catch (error) {
@@ -483,6 +485,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
       <div className={styles.header}>
         <Title level={2} className={styles.title}>快速捕捉</Title>
         <Text className={styles.subtitle}>记录想法，AI智能识别</Text>
+        <Text type="secondary" style={{ fontSize: '14px', marginTop: '8px', display: 'block' }}>
+          💡 提供更多上下文信息（如原因、背景、目标）能帮助AI做出更准确的判断
+        </Text>
       </div>
 
       <Card className={styles.inputCard}>
@@ -492,8 +497,15 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
             <TextArea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="记录你的想法、任务、感悟... AI将智能识别类型和优先级"
-              autoSize={{ minRows: 4, maxRows: 8 }}
+              placeholder={`记录你的想法、任务、感悟...
+
+💡 可包含更多信息：原因、背景、目标等
+
+例如：
+📋 学习TypeScript，因为项目需要重构
+🔗 https://example.com 这个设计很棒，想学习
+💭 严肃性和深度是解压的最好方式——项飙`}
+              autoSize={{ minRows: 6, maxRows: 10 }}
               className={styles.textArea}
               disabled={isRecognizing || isSubmitting}
             />
@@ -547,12 +559,29 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
                   <Tag color={recognitionResult.type === 'task' ? 'blue' : recognitionResult.type === 'goal' ? 'green' : 'purple'}>
                     {recognitionResult.type === 'task' ? '任务' : recognitionResult.type === 'goal' ? '目标' : '心则'}
                   </Tag>
+                  {recognitionResult.confidence && (
+                    <Tag 
+                      color={recognitionResult.confidence > 0.8 ? 'green' : recognitionResult.confidence > 0.6 ? 'orange' : 'red'}
+                      style={{ marginLeft: 8 }}
+                    >
+                      置信度: {Math.round(recognitionResult.confidence * 100)}%
+                    </Tag>
+                  )}
                 </div>
                 
                 <div className={styles.resultItem}>
                   <Text strong>摘要：</Text>
                   <Text>{recognitionResult.summary}</Text>
                 </div>
+
+                {recognitionResult.reasoning && (
+                  <div className={styles.resultItem}>
+                    <Text strong>分析理由：</Text>
+                    <Text type="secondary" style={{ fontStyle: 'italic' }}>
+                      {recognitionResult.reasoning}
+                    </Text>
+                  </div>
+                )}
               </Space>
               
               <Divider />

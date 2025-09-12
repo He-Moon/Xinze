@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuthWithResponse } from '../../../lib/api-utils';
-
-interface AIRecognitionResult {
-  type: 'task' | 'goal' | 'principle';
-  summary: string;
-}
+import { aiService, AIRecognitionResult } from '../../../lib/ai-service';
+import { prisma } from '../../../lib/db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -158,13 +155,14 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // 模拟AI识别延迟
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // 生成AI识别结果
-    const recognitionResult = generateAIRecognitionResult(content.trim());
+    // 调用真正的AI识别服务
     console.log('🔍 AI识别 - 输入内容:', content.trim());
+    
+    const recognitionResult = await aiService.recognizeContent(content.trim());
+    
     console.log('🔍 AI识别 - 识别结果:', recognitionResult);
+
+    // AI分析记录将在用户确认保存时，直接保存到业务表中
 
     return NextResponse.json({
       success: true,
@@ -184,33 +182,4 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// 生成AI识别结果的辅助函数
-function generateAIRecognitionResult(content: string): AIRecognitionResult {
-  const lowerContent = content.toLowerCase();
-  
-  // 简单的关键词匹配逻辑
-  let type: 'task' | 'goal' | 'principle' = 'task';
-  let summary = '';
-
-  // 类型识别
-  if (lowerContent.includes('目标') || lowerContent.includes('梦想') || lowerContent.includes('希望') || 
-      lowerContent.includes('想要') || lowerContent.includes('计划') || lowerContent.includes('愿景') ||
-      lowerContent.includes('学习') || lowerContent.includes('掌握') || lowerContent.includes('提升') ||
-      lowerContent.includes('成为') || lowerContent.includes('实现') || lowerContent.includes('达到')) {
-    type = 'goal';
-  } else if (lowerContent.includes('原则') || lowerContent.includes('价值观') || lowerContent.includes('信念') ||
-             lowerContent.includes('理念') || lowerContent.includes('准则') || lowerContent.includes('信条') ||
-             lowerContent.includes('感觉') || lowerContent.includes('感悟') || lowerContent.includes('体会') ||
-             lowerContent.includes('心得') || lowerContent.includes('启发') || lowerContent.includes('智慧')) {
-    type = 'principle';
-  }
-
-  // 生成摘要
-  const typeText = type === 'task' ? '任务' : type === 'goal' ? '目标' : '心则';
-  summary = `这是一个${typeText}，内容为：${content}`;
-
-  return {
-    type,
-    summary
-  };
-}
+// 删除旧的模拟函数，现在使用真正的AI服务

@@ -40,11 +40,10 @@ npm run dev
 
 ## 📚 文档
 
-- [开发指南](docs/development.md) - 开发环境搭建和开发流程
-- [API文档](docs/api.md) - 接口文档和使用说明
-- [样式系统](docs/style-system.md) - 设计系统和样式指南
-- [部署指南](docs/deployment.md) - 生产环境部署
-- [项目总结](PROJECT_SUMMARY.md) - 项目概述和技术总结
+- [开发状态](DEV_STATUS.md) - 当前进度和任务
+- [开发指南](docs/development.md) - 开发环境搭建
+- [API文档](docs/api.md) - 接口文档
+- [项目总结](PROJECT_SUMMARY.md) - 项目概述
 
 ## 📁 项目结构
 

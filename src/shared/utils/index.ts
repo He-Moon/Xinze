@@ -43,10 +43,14 @@ export const formatDateTime = (date: Date | string): string => {
   });
 };
 
-// 本地存储工具
+// 平台检测
+export const isWeb = typeof window !== 'undefined' && typeof document !== 'undefined';
+export const isMobile = isWeb && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+// 本地存储工具 - 跨平台兼容
 export const storage = {
   get: <T>(key: string): T | null => {
-    if (typeof window === 'undefined') return null;
+    if (!isWeb) return null;
     try {
       const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : null;
@@ -56,7 +60,7 @@ export const storage = {
   },
   
   set: <T>(key: string, value: T): void => {
-    if (typeof window === 'undefined') return;
+    if (!isWeb) return;
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
@@ -65,7 +69,7 @@ export const storage = {
   },
   
   remove: (key: string): void => {
-    if (typeof window === 'undefined') return;
+    if (!isWeb) return;
     try {
       localStorage.removeItem(key);
     } catch {
@@ -74,7 +78,7 @@ export const storage = {
   },
   
   clear: (): void => {
-    if (typeof window === 'undefined') return;
+    if (!isWeb) return;
     try {
       localStorage.clear();
     } catch {

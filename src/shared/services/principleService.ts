@@ -15,6 +15,12 @@ export interface CreatePrincipleRequest {
   content: string;
   description?: string;
   weight?: number;
+  // AI分析信息
+  aiType?: string;
+  aiSummary?: string;
+  aiConfidence?: number;
+  aiReasoning?: string;
+  aiModel?: string;
 }
 
 export interface UpdatePrincipleRequest {

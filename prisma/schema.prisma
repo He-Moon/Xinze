@@ -76,7 +76,14 @@ model Task {
   content     String?  // 任务内容、想法内容、链接URL
   priority    Int      @default(1)
   status      String   @default("pending") // pending, in_progress, completed, cancelled
-  aiAnalysis  String?  // AI分析结果 (JSON字符串)
+  
+  // AI分析信息
+  aiType        String?  // AI识别的类型
+  aiSummary     String?  // AI生成的摘要
+  aiConfidence  Float?   // AI置信度
+  aiReasoning   String?  // AI分析理由
+  aiModel       String?  // 使用的AI模型
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -92,6 +99,14 @@ model Goal {
   description String?
   priority    Int      @default(1)
   status      String   @default("active") // active, completed, paused
+  
+  // AI分析信息
+  aiType        String?  // AI识别的类型
+  aiSummary     String?  // AI生成的摘要
+  aiConfidence  Float?   // AI置信度
+  aiReasoning   String?  // AI分析理由
+  aiModel       String?  // 使用的AI模型
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -106,6 +121,14 @@ model Value {
   name        String
   description String?
   weight      Int      @default(1) // 权重 1-10
+  
+  // AI分析信息
+  aiType        String?  // AI识别的类型
+  aiSummary     String?  // AI生成的摘要
+  aiConfidence  Float?   // AI置信度
+  aiReasoning   String?  // AI分析理由
+  aiModel       String?  // 使用的AI模型
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

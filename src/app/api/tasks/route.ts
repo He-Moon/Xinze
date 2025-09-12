@@ -125,7 +125,13 @@ export async function POST(request: NextRequest) {
         type,
         priority: priority === 'high' ? 3 : priority === 'medium' ? 2 : 1,
         status: 'pending',
-        userId
+        userId,
+        // AI分析信息
+        aiType: body.aiType,
+        aiSummary: body.aiSummary,
+        aiConfidence: body.aiConfidence,
+        aiReasoning: body.aiReasoning,
+        aiModel: body.aiModel
       }
     });
 

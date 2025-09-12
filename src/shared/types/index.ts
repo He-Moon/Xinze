@@ -34,10 +34,55 @@ export interface Task {
   description?: string;
   status: 'pending' | 'in_progress' | 'completed';
   priority: 'low' | 'medium' | 'high';
+  type: 'task';
   dueDate?: Date;
   createdAt: Date;
   updatedAt: Date;
   userId: string;
+}
+
+// 目标相关类型
+export interface Goal {
+  id: string;
+  title: string;
+  description?: string;
+  status: 'active' | 'completed' | 'paused';
+  priority: 'low' | 'medium' | 'high';
+  type: 'long-term' | 'stage' | 'sub';
+  deadline?: Date;
+  progress: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+}
+
+// 心则相关类型
+export interface Principle {
+  id: string;
+  content: string;
+  description?: string;
+  tags: string[];
+  source: 'personal' | 'book' | 'article' | 'other';
+  weight: number;
+  createdAt: string;
+  userId: string;
+}
+
+// AI识别结果类型
+export interface AIRecognitionResult {
+  type: 'task' | 'goal' | 'principle';
+  summary: string;
+  confidence?: number;
+  reasoning?: string;
+}
+
+// AI分析信息类型
+export interface AIAnalysisInfo {
+  aiType?: string;
+  aiSummary?: string;
+  aiConfidence?: number;
+  aiReasoning?: string;
+  aiModel?: string;
 }
 
 // API响应类型
