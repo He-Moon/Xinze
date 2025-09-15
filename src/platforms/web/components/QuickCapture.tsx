@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Input, Button, Card, Space, Typography, App, message, Divider, Tag, Select } from 'antd';
-import { PlusOutlined, RobotOutlined, EditOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { captureService, CreateCaptureRequest } from '../../../shared/services/captureService';
+import { PlusOutlined, RobotOutlined, EditOutlined, CheckOutlined } from '@ant-design/icons';
+import { captureService, CreateCaptureRequest, AITaskAnalysisResult } from '../../../shared/services/captureService';
 import { taskService, CreateTaskRequest } from '../../../shared/services/taskService';
 import { goalService, CreateGoalRequest } from '../../../shared/services/goalService';
 import { principleService, CreatePrincipleRequest } from '../../../shared/services/principleService';
@@ -20,6 +20,7 @@ interface AIRecognitionResult {
   reasoning?: string;
 }
 
+
 interface QuickCaptureProps {
   onTaskCreated?: () => void;
   onGoalCreated?: () => void;
@@ -31,164 +32,12 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recognitionResult, setRecognitionResult] = useState<AIRecognitionResult | null>(null);
+  const [taskAnalysisResult, setTaskAnalysisResult] = useState<AITaskAnalysisResult | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedResult, setEditedResult] = useState<AIRecognitionResult | null>(null);
-  const [countdown, setCountdown] = useState(10);
-  const [isAutoSaving, setIsAutoSaving] = useState(false);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const { message } = App.useApp();
 
-  // 倒计时自动保存
-  useEffect(() => {
-    if (recognitionResult && !isEditing && !isAutoSaving) {
-      setCountdown(10);
-      countdownRef.current = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            handleAutoSave();
-            return 10;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-    }
 
-    return () => {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-    };
-  }, [recognitionResult, isEditing, isAutoSaving]);
-
-  // 自动保存
-  const handleAutoSave = async () => {
-    if (!recognitionResult) return;
-
-    try {
-      setIsAutoSaving(true);
-      
-      const finalResult = isEditing ? editedResult! : recognitionResult;
-      console.log('🔍 QuickCapture - 自动保存 - 最终识别结果:', finalResult);
-      console.log('🔍 QuickCapture - 自动保存 - 类型检查:', {
-        type: finalResult.type,
-        typeOf: typeof finalResult.type,
-        isTask: finalResult.type === 'task',
-        isGoal: finalResult.type === 'goal',
-        isPrinciple: finalResult.type === 'principle'
-      });
-      
-      // 根据识别结果决定保存方式
-      if (finalResult.type === 'task') {
-        // 保存为任务
-        const taskData: CreateTaskRequest = {
-          title: content.trim(),
-          description: finalResult.summary,
-          type: 'task',
-          priority: 'medium'
-        };
-
-        const result = await taskService.createTask(taskData);
-        
-        if (result.success) {
-          message.success('任务已自动保存！');
-          // 通知父组件任务已创建
-          onTaskCreated?.();
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '任务保存失败');
-        }
-      } else if (finalResult.type === 'goal') {
-        // 保存为目标
-        const goalData: CreateGoalRequest = {
-          title: content.trim(),
-          description: finalResult.summary,
-          priority: 'medium'
-        };
-
-        console.log('🔍 QuickCapture - 创建目标数据:', goalData);
-        const result = await goalService.createGoal(goalData);
-        console.log('📊 QuickCapture - 目标创建响应:', result);
-        
-        if (result.success) {
-          message.success('目标已自动保存！');
-          // 通知父组件目标已创建
-          onGoalCreated?.();
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '目标保存失败');
-        }
-      } else if (finalResult.type === 'principle') {
-        // 保存为心则
-        console.log('🔍 QuickCapture - 自动保存 - 进入心则保存分支');
-        const principleData: CreatePrincipleRequest = {
-          content: content.trim(),
-          description: finalResult.summary,
-          weight: 5
-        };
-
-        console.log('🔍 QuickCapture - 创建心则数据:', principleData);
-        const result = await principleService.createPrinciple(principleData);
-        console.log('📊 QuickCapture - 心则创建响应:', result);
-        
-        if (result.success) {
-          message.success('心则已自动保存！');
-          // 通知父组件心则已创建
-          onPrincipleCreated?.();
-          // 重置所有状态
-          setContent('');
-          setRecognitionResult(null);
-          setEditedResult(null);
-          setIsEditing(false);
-          setCountdown(10);
-        } else {
-          message.error(result.message || '心则保存失败');
-        }
-      } else {
-        // 保存为快速捕捉记录
-      const captureData: CreateCaptureRequest = {
-        content: content.trim(),
-        type: finalResult.type,
-        tags: [],
-        priority: 'medium'
-      };
-
-      const result = await captureService.createCapture(captureData);
-      
-      if (result.success) {
-        message.success('已自动保存！');
-        // 重置所有状态
-        setContent('');
-        setRecognitionResult(null);
-        setEditedResult(null);
-        setIsEditing(false);
-        setCountdown(10);
-      } else {
-        message.error(result.message || '自动保存失败');
-        }
-      }
-    } catch (error) {
-      console.error('自动保存失败:', error);
-      message.error('自动保存失败，请稍后重试');
-    } finally {
-      setIsAutoSaving(false);
-    }
-  };
 
   // AI识别功能 - 调用真实API
   const handleAIRecognition = async () => {
@@ -200,18 +49,64 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
     try {
       setIsRecognizing(true);
       
-      const result = await captureService.recognizeContent(content.trim());
+      // 1. 先进行内容类型识别
+      const recognitionResult = await captureService.recognizeContent(content.trim());
       
-      if (result.success && result.data) {
-        setRecognitionResult(result.data);
-        setEditedResult(result.data);
+      if (recognitionResult.success && recognitionResult.data) {
+        setRecognitionResult(recognitionResult.data);
+        setEditedResult(recognitionResult.data);
+        
+        // 2. 如果识别为任务，进行智能任务分析
+        if (recognitionResult.data.type === 'task') {
+          try {
+            const analysisResult = await captureService.analyzeTask(content.trim());
+            
+            if (analysisResult.success && analysisResult.data) {
+              setTaskAnalysisResult(analysisResult.data);
+              message.success('AI智能分析完成！');
+            } else {
+              message.warning('内容识别完成，但任务分析失败');
+            }
+          } catch (analysisError) {
+            console.error('任务分析失败:', analysisError);
+            message.warning('内容识别完成，但任务分析失败');
+          }
+        } else {
         message.success('AI识别完成！');
+        }
       } else {
-        message.error(result.message || 'AI识别失败');
+        message.error(recognitionResult.message || 'AI识别失败');
       }
     } catch (error) {
       console.error('AI识别失败:', error);
       message.error('AI识别失败，请稍后重试');
+    } finally {
+      setIsRecognizing(false);
+    }
+  };
+
+  // 重新AI分析功能
+  const handleReAnalyze = async () => {
+    if (!content.trim()) {
+      message.warning('请输入内容');
+      return;
+    }
+
+    try {
+      setIsRecognizing(true);
+      
+      // 清除之前的结果
+      setRecognitionResult(null);
+      setTaskAnalysisResult(null);
+      setEditedResult(null);
+      setIsEditing(false);
+      
+      // 重新进行AI识别和分析
+      await handleAIRecognition();
+      
+    } catch (error) {
+      console.error('重新分析失败:', error);
+      message.error('重新分析失败，请稍后重试');
     } finally {
       setIsRecognizing(false);
     }
@@ -224,12 +119,6 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
 
     try {
       setIsSubmitting(true);
-      
-      // 停止倒计时
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
       
       const finalResult = isEditing ? editedResult! : recognitionResult;
       console.log('🔍 QuickCapture - 手动保存 - 最终识别结果:', finalResult);
@@ -248,7 +137,23 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           title: content.trim(),
           description: finalResult.summary,
           type: 'task',
-          priority: 'medium'
+          priority: taskAnalysisResult?.priority || 'medium',
+          // AI分析结果
+          aiAnalysis: {
+            type: finalResult.type,
+            summary: finalResult.summary,
+            confidence: finalResult.confidence,
+            reasoning: finalResult.reasoning
+          },
+          // 时间分析
+          estimatedDuration: taskAnalysisResult?.timeAnalysis?.estimatedDuration,
+          hasDeadline: taskAnalysisResult?.timeAnalysis?.hasDeadline,
+          suggestedTimeframe: taskAnalysisResult?.timeAnalysis?.suggestedTimeframe,
+          // 重复性分析
+          isRecurring: taskAnalysisResult?.repetitionAnalysis?.isRecurring,
+          frequency: taskAnalysisResult?.repetitionAnalysis?.frequency,
+          // 目标关联
+          relatedGoals: taskAnalysisResult?.goalAlignment?.relatedGoals || []
         };
 
         const result = await taskService.createTask(taskData);
@@ -260,9 +165,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '任务保存失败');
         }
@@ -283,9 +188,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '目标保存失败');
         }
@@ -307,9 +212,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '心则保存失败');
         }
@@ -331,7 +236,6 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
         setRecognitionResult(null);
         setEditedResult(null);
         setIsEditing(false);
-        setCountdown(10);
       } else {
         message.error(result.message || '保存失败');
         }
@@ -346,11 +250,6 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
 
   // 开始编辑
   const handleEdit = () => {
-    // 停止倒计时
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-      countdownRef.current = null;
-    }
     setIsEditing(true);
   };
 
@@ -360,12 +259,6 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
 
     try {
       setIsSubmitting(true);
-      
-      // 停止倒计时
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
       
       // 根据识别结果决定保存方式
       if (editedResult.type === 'task') {
@@ -386,9 +279,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '任务保存失败');
         }
@@ -409,9 +302,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '目标保存失败');
         }
@@ -432,9 +325,9 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
           // 重置所有状态
           setContent('');
           setRecognitionResult(null);
+          setTaskAnalysisResult(null);
           setEditedResult(null);
           setIsEditing(false);
-          setCountdown(10);
         } else {
           message.error(result.message || '心则保存失败');
         }
@@ -456,7 +349,6 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
         setRecognitionResult(null);
         setEditedResult(null);
         setIsEditing(false);
-        setCountdown(10);
       } else {
         message.error(result.message || '保存失败');
         }
@@ -505,7 +397,7 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
 📋 学习TypeScript，因为项目需要重构
 🔗 https://example.com 这个设计很棒，想学习
 💭 严肃性和深度是解压的最好方式——项飙`}
-              autoSize={{ minRows: 6, maxRows: 10 }}
+              autoSize={{ minRows: 8, maxRows: 10 }}
               className={styles.textArea}
               disabled={isRecognizing || isSubmitting}
             />
@@ -534,21 +426,26 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
                 <Space>
                   <RobotOutlined className={styles.aiIcon} />
                   <Text strong>AI识别结果</Text>
-                  {!isAutoSaving && (
-                    <Space>
-                      <ClockCircleOutlined />
-                      <Text type="secondary">{countdown}秒后自动保存</Text>
-                    </Space>
-                  )}
                 </Space>
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={handleEdit}
-                  size="small"
-                >
-                  修改
-                </Button>
+                <Space>
+                  <Button
+                    type="text"
+                    icon={<RobotOutlined />}
+                    onClick={handleReAnalyze}
+                    size="small"
+                    loading={isRecognizing}
+                  >
+                    重新分析
+                  </Button>
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={handleEdit}
+                    size="small"
+                  >
+                    修改
+                  </Button>
+                </Space>
               </div>
               
               <Divider />
@@ -582,6 +479,79 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
                     </Text>
                   </div>
                 )}
+
+                {/* 任务分析结果展示 */}
+                {recognitionResult.type === 'task' && taskAnalysisResult && (
+                  <>
+                    <Divider />
+                    <div className={styles.resultItem}>
+                      <Text strong>智能分析结果：</Text>
+                    </div>
+                    
+                    {/* 时间分析 */}
+                    <div className={styles.resultItem}>
+                      <Text strong>⏰ 时间分析：</Text>
+                      <div style={{ marginLeft: 16 }}>
+                        <Text>预估时间：{taskAnalysisResult.timeAnalysis.estimatedDuration}</Text>
+                        {taskAnalysisResult.timeAnalysis.hasDeadline && (
+                          <Text style={{ marginLeft: 16, color: '#ff4d4f' }}>有截止时间</Text>
+                        )}
+                        <Text style={{ marginLeft: 16, color: '#1890ff' }}>
+                          建议时间：{taskAnalysisResult.timeAnalysis.suggestedTimeframe}
+                        </Text>
+                      </div>
+                    </div>
+
+                    {/* 重复性分析 */}
+                    {taskAnalysisResult.repetitionAnalysis.isRecurring && (
+                      <div className={styles.resultItem}>
+                        <Text strong>🔄 重复性：</Text>
+                        <Tag color="blue">
+                          {taskAnalysisResult.repetitionAnalysis.frequency === 'daily' ? '每日' :
+                           taskAnalysisResult.repetitionAnalysis.frequency === 'weekly' ? '每周' :
+                           taskAnalysisResult.repetitionAnalysis.frequency === 'monthly' ? '每月' : '重复'}
+                        </Tag>
+                      </div>
+                    )}
+
+                    {/* 目标关联 */}
+                    {taskAnalysisResult.goalAlignment.relatedGoals.length > 0 && (
+                      <div className={styles.resultItem}>
+                        <Text strong>🎯 关联目标：</Text>
+                        <div style={{ marginLeft: 16 }}>
+                          {taskAnalysisResult.goalAlignment.relatedGoals.map((goal, index) => (
+                            <div key={index} style={{ marginBottom: 8 }}>
+                              <Text>{goal.goalTitle}</Text>
+                              <Tag 
+                                color={goal.alignmentScore > 0.8 ? 'green' : goal.alignmentScore > 0.6 ? 'orange' : 'red'}
+                                style={{ marginLeft: 8 }}
+                              >
+                                关联度: {Math.round(goal.alignmentScore * 100)}%
+                              </Tag>
+                              <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
+                                {goal.reasoning}
+                              </Text>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 建议 */}
+                    {taskAnalysisResult.suggestions.length > 0 && (
+                      <div className={styles.resultItem}>
+                        <Text strong>💡 建议：</Text>
+                        <ul style={{ marginLeft: 16, marginTop: 4 }}>
+                          {taskAnalysisResult.suggestions.map((suggestion, index) => (
+                            <li key={index}>
+                              <Text type="secondary">{suggestion}</Text>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </>
+                )}
               </Space>
               
               <Divider />
@@ -591,13 +561,14 @@ export default function QuickCapture({ onTaskCreated, onGoalCreated, onPrinciple
                   type="primary"
                   icon={<CheckOutlined />}
                   onClick={handleSave}
-                  loading={isSubmitting || isAutoSaving}
-                  disabled={isSubmitting || isAutoSaving}
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
                 >
-                  {isAutoSaving ? '自动保存中...' : '立即保存'}
+                  保存
                 </Button>
                 <Button onClick={() => {
                   setRecognitionResult(null);
+                  setTaskAnalysisResult(null);
                   setEditedResult(null);
                 }}>
                   重新输入

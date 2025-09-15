@@ -1,4 +1,5 @@
 import { callAI, PROMPTS } from './ai-manager';
+import { AITaskAnalysisResult, Goal } from '../shared/types';
 
 export interface AIRecognitionResult {
   type: 'task' | 'goal' | 'principle';
@@ -7,12 +8,6 @@ export interface AIRecognitionResult {
   reasoning: string;
 }
 
-export interface AITaskAnalysis {
-  priority: 'low' | 'medium' | 'high';
-  estimatedTime: string;
-  category: string;
-  suggestions: string[];
-}
 
 export class AIService {
 
@@ -37,21 +32,89 @@ export class AIService {
     }
   }
 
-  async analyzeTask(content: string, userGoals?: string[]): Promise<AITaskAnalysis> {
+  async analyzeTask(content: string, userGoals?: Goal[]): Promise<AITaskAnalysisResult> {
     try {
-      const { content: responseContent } = await callAI(PROMPTS.taskAnalysis(content, userGoals), 'taskAnalysis');
+      // 构建目标上下文，将所有目标信息提供给AI
+      const goalsContext = userGoals ? userGoals.map(goal => 
+        `目标: ${goal.title} | 描述: ${goal.description || ''} | 分类: ${goal.category || ''} | 关键词: ${goal.keywords?.join(', ') || ''}`
+      ).join('\n') : '';
+      
+      const prompt = `分析任务：${content}
+${goalsContext ? `用户目标列表：\n${goalsContext}` : ''}
+
+返回JSON：
+{
+  "priority": "low|medium|high",
+  "estimatedTime": "时间",
+  "category": "分类",
+  "suggestions": ["建议"],
+  "timeAnalysis": {
+    "estimatedDuration": "2小时",
+    "hasDeadline": false,
+    "suggestedTimeframe": "工作日晚上"
+  },
+  "repetitionAnalysis": {
+    "isRecurring": true,
+    "frequency": "daily"
+  },
+  "goalAlignment": {
+    "relatedGoals": [
+      {
+        "goalTitle": "目标标题",
+        "alignmentScore": 0.85,
+        "reasoning": "关联理由"
+      }
+    ]
+  }
+}`;
+
+      const { content: responseContent } = await callAI({
+        system: "任务分析专家，优化任务管理。请以JSON格式返回结果。",
+        user: prompt,
+        temperature: 0.3,
+        maxTokens: 800
+      }, 'taskAnalysis');
+      
       const result = JSON.parse(responseContent || '{}');
       
       return {
         priority: result.priority || 'medium',
         estimatedTime: result.estimatedTime || '1小时',
         category: result.category || '其他',
-        suggestions: result.suggestions || []
+        suggestions: result.suggestions || [],
+        timeAnalysis: {
+          estimatedDuration: result.timeAnalysis?.estimatedDuration || '1小时',
+          hasDeadline: result.timeAnalysis?.hasDeadline || false,
+          suggestedTimeframe: result.timeAnalysis?.suggestedTimeframe || '随时'
+        },
+        repetitionAnalysis: {
+          isRecurring: result.repetitionAnalysis?.isRecurring || false,
+          frequency: result.repetitionAnalysis?.frequency
+        },
+        goalAlignment: {
+          relatedGoals: result.goalAlignment?.relatedGoals || []
+        }
       };
 
     } catch (error) {
       console.error('任务分析失败:', error);
-      return { priority: 'medium', estimatedTime: '1小时', category: '其他', suggestions: [] };
+      return { 
+        priority: 'medium', 
+        estimatedTime: '1小时', 
+        category: '其他', 
+        suggestions: [],
+        timeAnalysis: {
+          estimatedDuration: '1小时',
+          hasDeadline: false,
+          suggestedTimeframe: '随时'
+        },
+        repetitionAnalysis: {
+          isRecurring: false
+        },
+        goalAlignment: {
+          relatedGoals: []
+        }
+      };
     }
   }
 

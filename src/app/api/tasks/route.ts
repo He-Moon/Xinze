@@ -39,10 +39,17 @@ export async function GET(request: NextRequest) {
       where.type = type;
     }
 
-    // 从数据库获取任务
+    // 从数据库获取任务，包含任务-目标关联
     const [tasks, total] = await Promise.all([
       prisma.task.findMany({
         where,
+        include: {
+          taskGoals: {
+            include: {
+              goal: true
+            }
+          }
+        },
         orderBy: [
           { priority: 'desc' },
           { createdAt: 'desc' }
@@ -62,7 +69,28 @@ export async function GET(request: NextRequest) {
       type: task.type,
       priority: task.priority === 3 ? 'high' : task.priority === 2 ? 'medium' : 'low',
       status: task.status,
-      aiAnalysis: task.aiAnalysis,
+      // AI分析信息
+      aiType: task.aiType,
+      aiSummary: task.aiSummary,
+      aiConfidence: task.aiConfidence,
+      aiReasoning: task.aiReasoning,
+      aiModel: task.aiModel,
+      // 新增：时间分析
+      estimatedDuration: task.estimatedDuration,
+      hasDeadline: task.hasDeadline,
+      suggestedTimeframe: task.suggestedTimeframe,
+      // 新增：重复性分析
+      isRecurring: task.isRecurring,
+      frequency: task.frequency,
+      // 任务-目标关联
+      taskGoals: task.taskGoals.map(tg => ({
+        id: tg.id,
+        goalId: tg.goalId,
+        alignmentScore: tg.alignmentScore,
+        userConfirmed: tg.userConfirmed,
+        reasoning: tg.reasoning,
+        goal: tg.goal
+      })),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
       // 为了兼容 TodayView 的接口，添加一些额外字段
@@ -106,7 +134,24 @@ export async function POST(request: NextRequest) {
     const { userId } = user!;
 
     const body = await request.json();
-    const { title, description, content, type = 'task', priority = 1 } = body;
+    const { 
+      title, 
+      description, 
+      content, 
+      type = 'task', 
+      priority = 1,
+      // AI分析结果
+      aiAnalysis,
+      // 时间分析
+      estimatedDuration,
+      hasDeadline,
+      suggestedTimeframe,
+      // 重复性分析
+      isRecurring,
+      frequency,
+      // 目标关联
+      relatedGoals
+    } = body;
 
     // 验证必填字段
     if (!title || !title.trim()) {
@@ -127,13 +172,37 @@ export async function POST(request: NextRequest) {
         status: 'pending',
         userId,
         // AI分析信息
-        aiType: body.aiType,
-        aiSummary: body.aiSummary,
-        aiConfidence: body.aiConfidence,
-        aiReasoning: body.aiReasoning,
-        aiModel: body.aiModel
+        aiType: aiAnalysis?.type || body.aiType,
+        aiSummary: aiAnalysis?.summary || body.aiSummary,
+        aiConfidence: aiAnalysis?.confidence || body.aiConfidence,
+        aiReasoning: aiAnalysis?.reasoning || body.aiReasoning,
+        aiModel: body.aiModel,
+        // 时间分析
+        estimatedDuration,
+        hasDeadline: hasDeadline || false,
+        suggestedTimeframe,
+        // 重复性分析
+        isRecurring: isRecurring || false,
+        frequency
       }
     });
+
+    // 创建任务-目标关联
+    if (relatedGoals && relatedGoals.length > 0) {
+      await Promise.all(
+        relatedGoals.map((goalRelation: any) =>
+          prisma.taskGoalRelation.create({
+            data: {
+              taskId: task.id,
+              goalId: goalRelation.goalId,
+              alignmentScore: goalRelation.alignmentScore,
+              reasoning: goalRelation.reasoning,
+              userConfirmed: false // 默认未确认，等待用户确认
+            }
+          })
+        )
+      );
+    }
 
     return NextResponse.json({
       success: true,

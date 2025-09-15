@@ -67,7 +67,7 @@ export async function middleware(request: NextRequest) {
 // 配置中间件匹配的路径
 export const config = {
   matcher: [
-    '/api/capture/:path*', // 匹配capture及其子路径
+    '/api/capture/:path*', // 匹配capture及其子路径，包括/analyze
     '/api/tasks/:path*',
     '/api/goals/:path*',
     '/api/principles/:path*',

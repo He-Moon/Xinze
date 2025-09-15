@@ -23,11 +23,31 @@ export interface CreateTaskRequest {
   type?: 'task' | 'idea' | 'link';
   priority?: 'low' | 'medium' | 'high';
   // AI分析信息
+  aiAnalysis?: {
+    type: string;
+    summary: string;
+    confidence?: number;
+    reasoning?: string;
+  };
   aiType?: string;
   aiSummary?: string;
   aiConfidence?: number;
   aiReasoning?: string;
   aiModel?: string;
+  // 时间分析
+  estimatedDuration?: string;
+  hasDeadline?: boolean;
+  suggestedTimeframe?: string;
+  // 重复性分析
+  isRecurring?: boolean;
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  // 目标关联
+  relatedGoals?: Array<{
+    goalId: string;
+    goalTitle: string;
+    alignmentScore: number;
+    reasoning: string;
+  }>;
 }
 
 export interface UpdateTaskRequest {

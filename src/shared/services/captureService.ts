@@ -22,6 +22,32 @@ export interface CreateCaptureRequest {
 export interface AIRecognitionResult {
   type: 'task' | 'goal' | 'principle';
   summary: string;
+  confidence?: number;
+  reasoning?: string;
+}
+
+export interface AITaskAnalysisResult {
+  priority: 'low' | 'medium' | 'high';
+  estimatedTime: string;
+  category: string;
+  suggestions: string[];
+  timeAnalysis: {
+    estimatedDuration: string;
+    hasDeadline: boolean;
+    suggestedTimeframe: string;
+  };
+  repetitionAnalysis: {
+    isRecurring: boolean;
+    frequency?: 'daily' | 'weekly' | 'monthly';
+  };
+  goalAlignment: {
+    relatedGoals: Array<{
+      goalId: string;
+      goalTitle: string;
+      alignmentScore: number;
+      reasoning: string;
+    }>;
+  };
 }
 
 export interface CaptureListResponse {
@@ -87,6 +113,14 @@ export class CaptureService {
   // AI识别内容
   async recognizeContent(content: string): Promise<ApiResponse<AIRecognitionResult>> {
     return await apiClient.put<AIRecognitionResult>('/capture', { content });
+  }
+
+  // AI智能分析（任务分析）
+  async analyzeTask(content: string): Promise<ApiResponse<AITaskAnalysisResult>> {
+    return await apiClient.post<AITaskAnalysisResult>('/capture/analyze', {
+      content,
+      analysisType: 'task'
+    });
   }
 }
 
