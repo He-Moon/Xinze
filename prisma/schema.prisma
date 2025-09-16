@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -93,6 +93,9 @@ model Task {
   isRecurring Boolean @default(false)  // 是否重复任务
   frequency   String? // daily, weekly, monthly
   
+  // 向量嵌入 (用于语义搜索)
+  embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -122,6 +125,9 @@ model Goal {
   // 新增：目标分类和关键词
   category String?  // 目标分类
   keywords String?  // 关键词，JSON格式存储
+  
+  // 向量嵌入 (用于语义搜索)
+  embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

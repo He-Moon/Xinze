@@ -43,13 +43,19 @@ export async function POST(request: NextRequest) {
           title: true,
           description: true,
           category: true,
-          keywords: true
+          keywords: true,
+          status: true,
+          priority: true,
+          createdAt: true,
+          updatedAt: true,
+          userId: true
         }
       });
 
-      // 将keywords从JSON字符串转换为数组
+      // 将keywords从JSON字符串转换为数组，并确保所有必需字段存在
       const goalsWithKeywords = userGoals.map(goal => ({
         ...goal,
+        status: goal.status as 'active' | 'completed' | 'paused',
         keywords: goal.keywords ? JSON.parse(goal.keywords) : []
       }));
 

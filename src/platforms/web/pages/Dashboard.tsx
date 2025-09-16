@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Layout, Menu, Button, Avatar, Dropdown, Typography, Space, Modal, App } from 'antd';
+import { Layout, Button, Avatar, Dropdown, Typography, Space, Modal, App, Tabs } from 'antd';
 import { 
   PlusOutlined, 
   CalendarOutlined, 
-  MenuOutlined, 
   AimOutlined, 
   BarChartOutlined, 
   SettingOutlined,
@@ -21,15 +20,15 @@ import ReviewInsights from '../components/ReviewInsights';
 import Settings from '../components/Settings';
 import styles from './Dashboard.module.css';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Content } = Layout;
 const { Title, Text } = Typography;
+const { TabPane } = Tabs;
 
 type MenuKey = 'capture' | 'today' | 'goals' | 'review' | 'settings';
 
 export default function Dashboard() {
   const { user, logout, isLoading } = useAuthContext();
   const [selectedKey, setSelectedKey] = useState<MenuKey>('capture');
-  const [collapsed, setCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const router = useRouter();
@@ -92,31 +91,51 @@ export default function Dashboard() {
     },
   ];
 
-  const menuItems = [
+  const tabItems = [
     {
       key: 'capture',
-      icon: <PlusOutlined />,
-      label: '快速捕捉',
+      label: (
+        <span className={styles.tabLabel}>
+          <PlusOutlined />
+          快速捕捉
+        </span>
+      ),
     },
     {
       key: 'today',
-      icon: <CalendarOutlined />,
-      label: '今日任务',
+      label: (
+        <span className={styles.tabLabel}>
+          <CalendarOutlined />
+          今日任务
+        </span>
+      ),
     },
     {
       key: 'goals',
-      icon: <AimOutlined />,
-      label: '目标心则',
+      label: (
+        <span className={styles.tabLabel}>
+          <AimOutlined />
+          目标心则
+        </span>
+      ),
     },
     {
       key: 'review',
-      icon: <BarChartOutlined />,
-      label: '复盘洞见',
+      label: (
+        <span className={styles.tabLabel}>
+          <BarChartOutlined />
+          复盘洞见
+        </span>
+      ),
     },
     {
       key: 'settings',
-      icon: <SettingOutlined />,
-      label: '设置',
+      label: (
+        <span className={styles.tabLabel}>
+          <SettingOutlined />
+          设置
+        </span>
+      ),
     },
   ];
 
@@ -147,61 +166,45 @@ export default function Dashboard() {
 
   return (
     <div className={styles.fullScreenLayout}>
-      <Sider 
-        trigger={null} 
-        collapsible 
-        collapsed={collapsed}
-        className={styles.sider}
-      >
-        <div className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <span className={styles.logoText}>心</span>
+      <Header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <div className={styles.logo}>
+            <div className={styles.logoIcon}>
+              <span className={styles.logoText}>心</span>
+            </div>
+            <span className={styles.logoTitle}>心则</span>
           </div>
-          {!collapsed && <span className={styles.logoTitle}>心则</span>}
         </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[selectedKey]}
-          items={menuItems}
-          onClick={({ key }) => setSelectedKey(key as MenuKey)}
-          className={styles.menu}
-        />
-      </Sider>
-      
-      <div className={styles.mainArea}>
-        <Header className={styles.header}>
-          <div className={styles.headerLeft}>
-            <Button
-              type="text"
-              icon={<MenuOutlined />}
-              onClick={() => setCollapsed(!collapsed)}
-              className={styles.trigger}
-            />
-            <Title level={4} className={styles.pageTitle}>
-              {menuItems.find(item => item.key === selectedKey)?.label}
-            </Title>
-          </div>
-          
-          <div className={styles.headerRight}>
-            <Dropdown
-              menu={{ items: userMenuItems }}
-              placement="bottomRight"
-              trigger={['click']}
-            >
-              <Button type="text" className={styles.userButton}>
-                <Space>
-                  <Avatar size="small" icon={<UserOutlined />} />
-                  <Text>{user?.name || '用户'}</Text>
-                </Space>
-              </Button>
-            </Dropdown>
-          </div>
-        </Header>
         
-        <div className={styles.content}>
-          {renderContent()}
+        <div className={styles.headerCenter}>
+          <Tabs
+            activeKey={selectedKey}
+            onChange={(key) => setSelectedKey(key as MenuKey)}
+            items={tabItems}
+            className={styles.navTabs}
+            size="large"
+          />
         </div>
-      </div>
+        
+        <div className={styles.headerRight}>
+          <Dropdown
+            menu={{ items: userMenuItems }}
+            placement="bottomRight"
+            trigger={['click']}
+          >
+            <Button type="text" className={styles.userButton}>
+              <Space>
+                <Avatar size="small" icon={<UserOutlined />} />
+                <Text>{user?.name || '用户'}</Text>
+              </Space>
+            </Button>
+          </Dropdown>
+        </div>
+      </Header>
+      
+      <Content className={styles.content}>
+        {renderContent()}
+      </Content>
     </div>
   );
 }

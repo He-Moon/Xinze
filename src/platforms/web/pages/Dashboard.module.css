@@ -2,6 +2,7 @@
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   background-color: var(--bg-color-layout);
   overflow: hidden;
 }
@@ -86,12 +87,48 @@
   box-shadow: var(--shadow-sm);
   height: 64px;
   flex-shrink: 0;
+  z-index: 100;
 }
 
 .headerLeft {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  min-width: 200px;
+}
+
+.headerCenter {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+  justify-content: flex-end;
+}
+
+/* 导航标签页样式 - 使用Ant Design默认样式 */
+.navTabs {
+  width: 100%;
+}
+
+.navTabs :global(.ant-tabs-nav) {
+  margin: 0;
+}
+
+.navTabs :global(.ant-tabs-nav-wrap) {
+  justify-content: center;
+}
+
+.tabLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
 }
 
 .trigger {
@@ -138,24 +175,66 @@
   background-color: var(--bg-color-layout);
   overflow-y: auto;
   height: calc(100vh - 64px);
+  padding: 0;
 }
 
-@media (max-width: 768px) {
-  .sider {
-    position: fixed;
-    z-index: 1000;
-    height: 100vh;
-  }
-  
-  .mainArea {
-    width: 100%;
-  }
-  
+/* 响应式设计 */
+@media (max-width: 1200px) {
   .header {
     padding: 0 var(--spacing-md);
   }
   
-  .pageTitle {
-    font-size: 16px;
+  .headerLeft,
+  .headerRight {
+    min-width: 150px;
+  }
+  
+  
+  .tabLabel {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 var(--spacing-sm);
+    height: 56px;
+  }
+  
+  .headerLeft,
+  .headerRight {
+    min-width: 100px;
+  }
+  
+  .logoTitle {
+    display: none;
+  }
+  
+  
+  .tabLabel {
+    font-size: 12px;
+  }
+  
+  .tabLabel span:last-child {
+    display: none;
+  }
+  
+  .userButton {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .userButton span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 var(--spacing-xs);
+  }
+  
+  
+  .tabLabel {
+    gap: 4px;
   }
 }

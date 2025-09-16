@@ -59,10 +59,7 @@ export interface Goal {
   title: string;
   description?: string;
   status: 'active' | 'completed' | 'paused';
-  priority: 'low' | 'medium' | 'high';
-  type: 'long-term' | 'stage' | 'sub';
-  deadline?: Date;
-  progress: number;
+  priority: number; // 与 Prisma schema 保持一致，使用 number
   createdAt: Date;
   updatedAt: Date;
   userId: string;

@@ -1,19 +1,35 @@
+/* 极简快速捕捉样式 - 学习Google首页布局 */
+
+/* 移除Ant Design按钮的默认下边框 */
+.typeButton:focus,
+.typeButton:active {
+  box-shadow: none !important;
+}
 .container {
-  padding: var(--spacing-lg);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: calc(100vh - 64px);
+  padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-xxl);
+  background-color: var(--bg-color-layout);
+}
+
+.content {
+  width: 100%;
   max-width: 800px;
-  margin: 0 auto;
-  min-height: 100%;
-  background-color: yellow;
+  background: transparent;
+  padding: 0;
 }
 
 .header {
   text-align: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-xxxl);
 }
 
 .title {
   color: var(--text-color);
   margin-bottom: var(--spacing-sm) !important;
+  font-weight: 600;
 }
 
 .subtitle {
@@ -21,14 +37,8 @@
   font-size: var(--font-size);
 }
 
-.inputCard {
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-}
-
 .inputSection {
-  width: 100%;
+  margin-bottom: var(--spacing-xs);
 }
 
 .textArea {
@@ -36,129 +46,147 @@
   border: 1px solid var(--border-color);
   font-size: var(--font-size);
   line-height: var(--line-height);
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
 }
 
 .textArea:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+  box-shadow: 0 0 0 2px var(--primary-color-light);
 }
 
 .actions {
   display: flex;
-  justify-content: center;
-}
-
-.actionButton {
-  border-radius: var(--border-radius-md);
-  border: 1px solid var(--border-color);
-  color: var(--text-color-secondary);
-}
-
-.actionButton:hover {
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-.selectionRow {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-.typeSelection,
-.prioritySelection {
-  display: flex;
-  align-items: center;
-}
-
-.typeSelect,
-.prioritySelect {
-  min-width: 120px;
-}
-
-.tagsSection {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tagIcon {
-  color: var(--text-color-tertiary);
-  margin-right: var(--spacing-xs);
-}
-
-.tagsSelect {
-  min-width: 200px;
-}
-
-.recognizeButton {
-  border-radius: var(--border-radius-md);
-  height: 48px;
-  font-size: var(--font-size-lg);
-  font-weight: 500;
-}
-
-.resultCard {
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
   margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-xxl);
 }
 
-.editCard {
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  margin-top: var(--spacing-lg);
-}
-
-.resultHeader {
+.typeSelection {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
-}
-
-.aiIcon {
-  color: var(--primary-color);
-  font-size: 18px;
-}
-
-.resultItem {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
-.editItem {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
-  min-height: 32px;
+.typeButton {
+  height: 28px;
+  padding: 0 var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
 }
 
-.resultItem strong,
-.editItem strong {
-  min-width: 60px;
+.saveButton {
+  height: 36px;
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size);
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
+}
+
+.saveButton:hover {
+  background: var(--primary-color-hover);
+  border-color: var(--primary-color-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.saveButton:active {
+  transform: translateY(0);
+}
+
+.resetButton {
+  height: 36px;
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size);
+  color: var(--text-color-secondary);
+  border-color: var(--border-color);
+  background: var(--bg-color);
+  transition: all var(--motion-duration-slow) var(--motion-ease-in-out);
+}
+
+.resetButton:hover {
   color: var(--text-color);
+  border-color: var(--primary-color);
+  background: var(--primary-color-light);
 }
 
-/* 按钮组样式 */
-.ant-space .ant-btn {
-  transition: all var(--motion-duration-mid) var(--motion-ease-in-out);
-}
-
+/* 响应式设计 */
 @media (max-width: 768px) {
   .container {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-xl);
+  }
+  
+  .content {
+    padding: var(--spacing-xl);
+  }
+  
+  .title {
+    font-size: var(--font-size-xl);
+  }
+  
+  .typeSelection {
+    gap: var(--spacing-xs);
+    justify-content: flex-start;
+  }
+  
+  .typeButton {
+    height: 24px;
+    padding: 0 var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .actions {
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+  }
+  
+  .saveButton,
+  .resetButton {
+    height: 32px;
+    padding: 0 var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-lg);
+  }
+  
+  .content {
+    padding: var(--spacing-lg);
+  }
+  
+  .typeSelection {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    justify-content: flex-start;
+  }
+  
+  .typeButton {
+    width: 100%;
+    height: 24px;
   }
   
   .actions {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
   }
   
-  .actionButton {
+  .saveButton,
+  .resetButton {
     width: 100%;
+    height: 32px;
   }
 }

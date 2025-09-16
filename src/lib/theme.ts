@@ -115,7 +115,6 @@ export const theme: ThemeConfig = {
       motionDurationSlow: '0.3s',
       motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
       motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
-      motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
     },
     
     // 卡片组件
@@ -160,7 +159,6 @@ export const theme: ThemeConfig = {
       motionDurationSlow: '0.3s',
       motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
       motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
-      motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
     },
     
     // 选择器组件
@@ -247,7 +245,6 @@ export const theme: ThemeConfig = {
       motionDurationSlow: '0.3s',
       motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
       motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
-      motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
     },
     
     // Tab 组件
@@ -273,7 +270,6 @@ export const theme: ThemeConfig = {
       motionDurationSlow: '0.3s',
       motionEaseInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
       motionEaseOut: 'cubic-bezier(0, 0, 0.2, 1)',
-      motionEaseIn: 'cubic-bezier(0.4, 0, 1, 1)',
     },
     
     // 面包屑组件
@@ -299,11 +295,6 @@ export const theme: ThemeConfig = {
       headerBg: '#f5f5f5',
     },
     
-    // 手风琴组件
-    Accordion: {
-      borderRadius: 4,
-      headerBg: '#f5f5f5',
-    },
   },
 };
 
