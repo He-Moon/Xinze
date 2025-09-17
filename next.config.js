@@ -8,12 +8,24 @@ const nextConfig = {
   // 优化编译性能
   swcMinify: true,
   
+  // 实验性功能
+  experimental: {
+    // 确保路径别名正确解析
+    esmExternals: 'loose',
+  },
+  
   // 仅在非 Turbopack 模式下使用 webpack 配置
   ...(process.env.TURBOPACK !== '1' && {
     compiler: {
       removeConsole: process.env.NODE_ENV === 'production',
     },
     webpack: (config, { dev, isServer }) => {
+      // 确保路径别名解析
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@': require('path').resolve(__dirname, 'src'),
+      };
+      
       if (dev) {
         // 开发环境优化
         config.watchOptions = {
