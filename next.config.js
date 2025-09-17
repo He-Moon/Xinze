@@ -10,8 +10,7 @@ const nextConfig = {
   
   // 实验性功能
   experimental: {
-    // 确保路径别名正确解析
-    esmExternals: 'loose',
+    // 其他实验性功能可以在这里添加
   },
   
   // 仅在非 Turbopack 模式下使用 webpack 配置

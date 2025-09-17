@@ -93,8 +93,8 @@ model Task {
   isRecurring Boolean @default(false)  // 是否重复任务
   frequency   String? // daily, weekly, monthly
   
-  // 向量嵌入 (用于语义搜索)
-  embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
+  // 向量嵌入 (用于语义搜索) - 暂时注释，等启用 pgvector 后再取消注释
+  // embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -126,8 +126,8 @@ model Goal {
   category String?  // 目标分类
   keywords String?  // 关键词，JSON格式存储
   
-  // 向量嵌入 (用于语义搜索)
-  embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
+  // 向量嵌入 (用于语义搜索) - 暂时注释，等启用 pgvector 后再取消注释
+  // embedding Unsupported("vector(1536)")? // OpenAI 嵌入向量
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
