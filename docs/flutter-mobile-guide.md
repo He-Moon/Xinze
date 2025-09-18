@@ -34,7 +34,12 @@ mobile_flutter/
 
 ## 🚀 快速开始
 
-### 1. 安装 Flutter SDK
+### 1. 环境要求
+- Windows 10/11
+- Android Studio
+- Flutter SDK
+
+### 2. 安装 Flutter SDK
 
 ```bash
 # 下载 Flutter SDK
@@ -44,6 +49,22 @@ mobile_flutter/
 
 # 验证安装
 flutter doctor
+```
+
+### 3. 安装 Android Studio
+
+```bash
+# 下载并安装 Android Studio
+# 访问 https://developer.android.com/studio
+# 安装时选择 Android SDK、Android SDK Platform-Tools、Android SDK Build-Tools
+```
+
+### 4. 配置 Android 设备
+
+```bash
+# 启用开发者选项和 USB 调试
+# 连接 Android 设备或启动模拟器
+flutter devices
 ```
 
 ### 2. 运行项目

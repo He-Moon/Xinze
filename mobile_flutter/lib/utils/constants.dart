@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppConstants {
+  // 应用配置 - 与Web端保持一致
   static const String appName = '心则';
   static const String appVersion = '1.0.0';
   static const String appDescription = '心之准则，行动之始';

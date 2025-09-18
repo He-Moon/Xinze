@@ -1,3 +1,10 @@
+// 应用配置常量
+export const APP_CONFIG = {
+  NAME: '心则',
+  VERSION: '1.0.0',
+  DESCRIPTION: '心之准则，行动之始',
+} as const;
+
 // API相关常量
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
