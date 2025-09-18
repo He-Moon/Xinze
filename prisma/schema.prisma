@@ -71,10 +71,9 @@ model VerificationToken {
 model Task {
   id          String   @id @default(cuid())
   title       String
-  description String?
   type        String   @default("task") // task, idea, link
   content     String?  // 任务内容、想法内容、链接URL
-  priority    Int      @default(1)
+  priority    String   @default("routine") // important_urgent, important_not_urgent, not_important_urgent, routine
   status      String   @default("pending") // pending, in_progress, completed, cancelled
   
   // AI分析信息

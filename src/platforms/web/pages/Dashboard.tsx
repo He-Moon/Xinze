@@ -13,7 +13,6 @@ import {
   LogoutOutlined
 } from '@ant-design/icons';
 import { useAuthContext } from '../../../components/providers/AuthProvider';
-import QuickCapture from '../components/QuickCapture';
 import TaskManagement from '../components/TodayView';
 import GoalsAndPrinciples from '../components/GoalsAndPrinciples';
 import ReviewInsights from '../components/ReviewInsights';
@@ -24,11 +23,11 @@ const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
-type MenuKey = 'capture' | 'today' | 'goals' | 'review' | 'settings';
+type MenuKey = 'today' | 'goals' | 'review' | 'settings';
 
 export default function Dashboard() {
   const { user, logout, isLoading } = useAuthContext();
-  const [selectedKey, setSelectedKey] = useState<MenuKey>('capture');
+  const [selectedKey, setSelectedKey] = useState<MenuKey>('today');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const router = useRouter();
@@ -61,20 +60,6 @@ export default function Dashboard() {
     });
   };
 
-  // 刷新任务列表
-  const handleTaskCreated = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  // 刷新目标列表
-  const handleGoalCreated = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
-
-  // 刷新心则列表
-  const handlePrincipleCreated = () => {
-    setRefreshTrigger(prev => prev + 1);
-  };
 
   const userMenuItems = [
     {
@@ -92,15 +77,6 @@ export default function Dashboard() {
   ];
 
   const tabItems = [
-    {
-      key: 'capture',
-      label: (
-        <span className={styles.tabLabel}>
-          <PlusOutlined />
-          快速捕捉
-        </span>
-      ),
-    },
     {
       key: 'today',
       label: (
@@ -141,12 +117,6 @@ export default function Dashboard() {
 
   const renderContent = () => {
     switch (selectedKey) {
-      case 'capture':
-        return <QuickCapture 
-          onTaskCreated={handleTaskCreated} 
-          onGoalCreated={handleGoalCreated}
-          onPrincipleCreated={handlePrincipleCreated}
-        />;
       case 'today':
         return <TaskManagement refreshTrigger={refreshTrigger} />;
       case 'goals':
@@ -156,11 +126,7 @@ export default function Dashboard() {
       case 'settings':
         return <Settings />;
       default:
-        return <QuickCapture 
-          onTaskCreated={handleTaskCreated} 
-          onGoalCreated={handleGoalCreated}
-          onPrincipleCreated={handlePrincipleCreated}
-        />;
+        return <TaskManagement refreshTrigger={refreshTrigger} />;
     }
   };
 

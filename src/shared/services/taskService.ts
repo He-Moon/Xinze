@@ -4,12 +4,36 @@ import { ApiResponse } from '../types';
 export interface Task {
   id: string;
   title: string;
-  description?: string;
   content?: string;
   type: 'task' | 'idea' | 'link';
-  priority: 'low' | 'medium' | 'high';
+  priority: 'important_urgent' | 'important_not_urgent' | 'not_important_urgent' | 'routine';
   status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
-  aiAnalysis?: string;
+  // AI分析信息
+  aiType?: string;
+  aiSummary?: string;
+  aiConfidence?: number;
+  aiReasoning?: string;
+  aiModel?: string;
+  // 时间分析
+  estimatedDuration?: string;
+  hasDeadline?: boolean;
+  suggestedTimeframe?: string;
+  // 重复性分析
+  isRecurring?: boolean;
+  frequency?: 'daily' | 'weekly' | 'monthly';
+  // 任务-目标关联
+  taskGoals?: Array<{
+    id: string;
+    goalId: string;
+    alignmentScore: number;
+    userConfirmed: boolean;
+    reasoning: string;
+    goal: {
+      id: string;
+      title: string;
+      description?: string;
+    };
+  }>;
   createdAt: string;
   updatedAt: string;
   completed: boolean;
@@ -18,10 +42,9 @@ export interface Task {
 
 export interface CreateTaskRequest {
   title: string;
-  description?: string;
   content?: string;
   type?: 'task' | 'idea' | 'link';
-  priority?: 'low' | 'medium' | 'high';
+  priority?: 'important_urgent' | 'important_not_urgent' | 'not_important_urgent' | 'routine';
   // AI分析信息
   aiAnalysis?: {
     type: string;
@@ -52,9 +75,8 @@ export interface CreateTaskRequest {
 
 export interface UpdateTaskRequest {
   title?: string;
-  description?: string;
   content?: string;
-  priority?: 'low' | 'medium' | 'high';
+  priority?: 'important_urgent' | 'important_not_urgent' | 'not_important_urgent' | 'routine';
   status?: 'pending' | 'in_progress' | 'completed' | 'cancelled';
 }
 

@@ -64,10 +64,9 @@ export async function GET(request: NextRequest) {
     const formattedTasks = tasks.map(task => ({
       id: task.id,
       title: task.title,
-      description: task.description,
       content: task.content,
       type: task.type,
-      priority: task.priority === 3 ? 'high' : task.priority === 2 ? 'medium' : 'low',
+      priority: task.priority,
       status: task.status,
       // AI分析信息
       aiType: task.aiType,
@@ -89,7 +88,11 @@ export async function GET(request: NextRequest) {
         alignmentScore: tg.alignmentScore,
         userConfirmed: tg.userConfirmed,
         reasoning: tg.reasoning,
-        goal: tg.goal
+        goal: {
+          id: tg.goal.id,
+          title: tg.goal.title,
+          description: tg.goal.description
+        }
       })),
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
@@ -136,10 +139,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { 
       title, 
-      description, 
       content, 
       type = 'task', 
-      priority = 1,
+      priority = 'routine',
       // AI分析结果
       aiAnalysis,
       // 时间分析
@@ -165,10 +167,9 @@ export async function POST(request: NextRequest) {
     const task = await prisma.task.create({
       data: {
         title: title.trim(),
-        description: description?.trim(),
         content: content?.trim(),
         type,
-        priority: priority === 'high' ? 3 : priority === 'medium' ? 2 : 1,
+        priority,
         status: 'pending',
         userId,
         // AI分析信息
@@ -209,10 +210,9 @@ export async function POST(request: NextRequest) {
       data: {
         id: task.id,
         title: task.title,
-        description: task.description,
         content: task.content,
         type: task.type,
-        priority: task.priority === 3 ? 'high' : task.priority === 2 ? 'medium' : 'low',
+        priority: task.priority,
         status: task.status,
         createdAt: task.createdAt.toISOString(),
         updatedAt: task.updatedAt.toISOString(),
@@ -244,7 +244,7 @@ export async function PUT(request: NextRequest) {
     const { userId } = user!;
 
     const body = await request.json();
-    const { id, title, description, content, priority, status } = body;
+    const { id, title, content, priority, status } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -271,11 +271,8 @@ export async function PUT(request: NextRequest) {
     // 构建更新数据
     const updateData: any = {};
     if (title !== undefined) updateData.title = title.trim();
-    if (description !== undefined) updateData.description = description?.trim();
     if (content !== undefined) updateData.content = content?.trim();
-    if (priority !== undefined) {
-      updateData.priority = priority === 'high' ? 3 : priority === 'medium' ? 2 : 1;
-    }
+    if (priority !== undefined) updateData.priority = priority;
     if (status !== undefined) updateData.status = status;
 
     // 更新任务
@@ -289,10 +286,9 @@ export async function PUT(request: NextRequest) {
       data: {
         id: updatedTask.id,
         title: updatedTask.title,
-        description: updatedTask.description,
         content: updatedTask.content,
         type: updatedTask.type,
-        priority: updatedTask.priority === 3 ? 'high' : updatedTask.priority === 2 ? 'medium' : 'low',
+        priority: updatedTask.priority,
         status: updatedTask.status,
         createdAt: updatedTask.createdAt.toISOString(),
         updatedAt: updatedTask.updatedAt.toISOString(),
