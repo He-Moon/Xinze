@@ -1,7 +1,8 @@
 import { ApiResponse } from '../types';
-import { API_BASE_URL, AUTH_TOKEN_KEY } from '../constants';
+import { AUTH_TOKEN_KEY } from '../constants';
 import { storage, handleApiError } from '../utils';
 import { authErrorHandler } from '../../lib/auth-error-handler';
+import { API_CONFIG, getApiUrl } from '../config/api';
 
 // HTTP客户端配置
 class ApiClient {
@@ -9,10 +10,8 @@ class ApiClient {
   private defaultHeaders: Record<string, string>;
 
   constructor() {
-    this.baseURL = API_BASE_URL;
-    this.defaultHeaders = {
-      'Content-Type': 'application/json',
-    };
+    this.baseURL = API_CONFIG.baseUrl;
+    this.defaultHeaders = API_CONFIG.headers;
   }
 
   // 获取认证token
@@ -151,11 +150,7 @@ class ApiClient {
 
   // 构建URL的辅助方法
   private buildUrl(endpoint: string): string {
-    if (this.baseURL.startsWith('http')) {
-      return `${this.baseURL}${endpoint}`;
-    } else {
-      return `${this.baseURL}${endpoint}`;
-    }
+    return getApiUrl(endpoint);
   }
 }
 

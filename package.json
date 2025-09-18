@@ -1,5 +1,5 @@
 {
-  "name": "guanzhi",
+  "name": "xinze",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,6 +18,9 @@
     "generate:styles": "node scripts/generate-all.js",
     "generate:css": "node scripts/generate-css-variables.js",
     "generate:antd": "node scripts/generate-antd-theme.js",
+    "deploy": "node scripts/deploy.js",
+    "deploy:web": "vercel --prod",
+    "deploy:mobile": "cd mobile_flutter && flutter build apk --release",
     "postinstall": "prisma generate"
   },
   "dependencies": {
