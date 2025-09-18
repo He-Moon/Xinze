@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiResponse } from '@/shared/types';
-import { withPrisma } from '@/lib/db';
+import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/jwt';
 
 export async function GET(request: NextRequest) {
@@ -26,10 +26,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 查找用户
-    const user = await withPrisma(async (prisma) => {
-      return await prisma.user.findUnique({
-        where: { id: payload.userId }
-      });
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId }
     });
 
     if (!user) {
