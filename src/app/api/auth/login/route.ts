@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiResponse } from '@/shared/types';
-import { prisma } from '@/lib/db';
+import { withPrisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
 
@@ -18,8 +18,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 查找用户
-    const user = await prisma.user.findUnique({
-      where: { email }
+    const user = await withPrisma(async (prisma) => {
+      return await prisma.user.findUnique({
+        where: { email }
+      });
     });
 
     if (!user) {
