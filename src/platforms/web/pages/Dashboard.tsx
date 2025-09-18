@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useAuthContext } from '../../../components/providers/AuthProvider';
 import QuickCapture from '../components/QuickCapture';
-import TodayView from '../components/TodayView';
+import TaskManagement from '../components/TodayView';
 import GoalsAndPrinciples from '../components/GoalsAndPrinciples';
 import ReviewInsights from '../components/ReviewInsights';
 import Settings from '../components/Settings';
@@ -106,7 +106,7 @@ export default function Dashboard() {
       label: (
         <span className={styles.tabLabel}>
           <CalendarOutlined />
-          今日任务
+          任务管理
         </span>
       ),
     },
@@ -148,7 +148,7 @@ export default function Dashboard() {
           onPrincipleCreated={handlePrincipleCreated}
         />;
       case 'today':
-        return <TodayView refreshTrigger={refreshTrigger} />;
+        return <TaskManagement refreshTrigger={refreshTrigger} />;
       case 'goals':
         return <GoalsAndPrinciples refreshTrigger={refreshTrigger} />;
       case 'review':

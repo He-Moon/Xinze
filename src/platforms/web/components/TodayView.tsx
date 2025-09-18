@@ -1,21 +1,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Checkbox, Button, Space, Typography, Divider, Empty, Spin, message } from 'antd';
-import { ClockCircleOutlined, PlusOutlined, CheckOutlined, EditOutlined } from '@ant-design/icons';
+import { Card, Checkbox, Button, Space, Typography, Divider, Empty, Spin, message, Modal, Form, Input, Select, Popconfirm } from 'antd';
+import { ClockCircleOutlined, PlusOutlined, CheckOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import styles from './TodayView.module.css';
-import { taskService, Task } from '../../../shared/services/taskService';
+import { taskService, Task, CreateTaskRequest, UpdateTaskRequest } from '../../../shared/services/taskService';
 
 const { Title, Text } = Typography;
+const { TextArea } = Input;
+const { Option } = Select;
 
-interface TodayViewProps {
+interface TaskManagementProps {
   refreshTrigger?: number;
 }
 
-export default function TodayView({ refreshTrigger }: TodayViewProps) {
+export default function TaskManagement({ refreshTrigger }: TaskManagementProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // 任务管理相关状态
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [addForm] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   // 获取任务数据
   const fetchTasks = async () => {
@@ -88,9 +97,94 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
     }
   };
 
+  // 添加任务
   const handleAddTask = () => {
-    // TODO: 实现添加任务功能
-    console.log('添加新任务');
+    addForm.resetFields();
+    setIsAddModalVisible(true);
+  };
+
+  // 提交添加任务
+  const handleAddTaskSubmit = async () => {
+    try {
+      const values = await addForm.validateFields();
+      const taskData: CreateTaskRequest = {
+        title: values.title,
+        description: values.description,
+        content: values.content,
+        priority: values.priority || 'medium',
+        type: 'task'
+      };
+      
+      const response = await taskService.createTask(taskData);
+      if (response.success) {
+        message.success('任务创建成功');
+        setIsAddModalVisible(false);
+        fetchTasks(); // 刷新任务列表
+      } else {
+        message.error('任务创建失败');
+      }
+    } catch (error) {
+      console.error('创建任务失败:', error);
+      message.error('创建任务失败，请稍后重试');
+    }
+  };
+
+  // 编辑任务
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    editForm.setFieldsValue({
+      title: task.title,
+      description: task.description,
+      content: task.content,
+      priority: task.priority,
+      status: task.status
+    });
+    setIsEditModalVisible(true);
+  };
+
+  // 提交编辑任务
+  const handleEditTaskSubmit = async () => {
+    if (!editingTask) return;
+    
+    try {
+      const values = await editForm.validateFields();
+      const updateData: UpdateTaskRequest = {
+        title: values.title,
+        description: values.description,
+        content: values.content,
+        priority: values.priority,
+        status: values.status
+      };
+      
+      const response = await taskService.updateTask(editingTask.id, updateData);
+      if (response.success) {
+        message.success('任务更新成功');
+        setIsEditModalVisible(false);
+        setEditingTask(null);
+        fetchTasks(); // 刷新任务列表
+      } else {
+        message.error('任务更新失败');
+      }
+    } catch (error) {
+      console.error('更新任务失败:', error);
+      message.error('更新任务失败，请稍后重试');
+    }
+  };
+
+  // 删除任务
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      const response = await taskService.deleteTask(taskId);
+      if (response.success) {
+        message.success('任务删除成功');
+        fetchTasks(); // 刷新任务列表
+      } else {
+        message.error('任务删除失败');
+      }
+    } catch (error) {
+      console.error('删除任务失败:', error);
+      message.error('删除任务失败，请稍后重试');
+    }
   };
 
   const handleReview = () => {
@@ -123,7 +217,7 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div>
-            <Title level={2} className={styles.title}>今日任务</Title>
+            <Title level={2} className={styles.title}>任务管理</Title>
             <Text className={styles.subtitle}>
               {new Date().toLocaleDateString('zh-CN', { 
                 year: 'numeric', 
@@ -167,11 +261,31 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
                         <Text className={styles.taskDescription}>{task.description}</Text>
                       )}
                     </div>
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      className={styles.taskAction}
-                    />
+                    <Space>
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        className={styles.taskAction}
+                        onClick={() => handleEditTask(task)}
+                        title="编辑任务"
+                      />
+                      <Popconfirm
+                        title="确定要删除这个任务吗？"
+                        description="删除后无法恢复"
+                        icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
+                        onConfirm={() => handleDeleteTask(task.id)}
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          className={styles.taskAction}
+                          danger
+                          title="删除任务"
+                        />
+                      </Popconfirm>
+                    </Space>
                   </div>
                 </Card>
               ))}
@@ -204,11 +318,31 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
                         {task.priority === 'high' ? '高' : task.priority === 'medium' ? '中' : '低'}
                       </Text>
                     </div>
-                    <Button
-                      type="text"
-                      icon={<EditOutlined />}
-                      className={styles.taskAction}
-                    />
+                    <Space>
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        className={styles.taskAction}
+                        onClick={() => handleEditTask(task)}
+                        title="编辑任务"
+                      />
+                      <Popconfirm
+                        title="确定要删除这个任务吗？"
+                        description="删除后无法恢复"
+                        icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
+                        onConfirm={() => handleDeleteTask(task.id)}
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          className={styles.taskAction}
+                          danger
+                          title="删除任务"
+                        />
+                      </Popconfirm>
+                    </Space>
                   </div>
                 </Card>
               ))}
@@ -238,6 +372,31 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
                         <Text className={styles.taskDescription}>{task.description}</Text>
                       )}
                     </div>
+                    <Space>
+                      <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        className={styles.taskAction}
+                        onClick={() => handleEditTask(task)}
+                        title="编辑任务"
+                      />
+                      <Popconfirm
+                        title="确定要删除这个任务吗？"
+                        description="删除后无法恢复"
+                        icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
+                        onConfirm={() => handleDeleteTask(task.id)}
+                        okText="确定"
+                        cancelText="取消"
+                      >
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          className={styles.taskAction}
+                          danger
+                          title="删除任务"
+                        />
+                      </Popconfirm>
+                    </Space>
                   </div>
                 </Card>
               ))}
@@ -282,6 +441,134 @@ export default function TodayView({ refreshTrigger }: TodayViewProps) {
           </Button>
         </Space>
       </div>
+
+      {/* 添加任务模态框 */}
+      <Modal
+        title="添加新任务"
+        open={isAddModalVisible}
+        onOk={handleAddTaskSubmit}
+        onCancel={() => setIsAddModalVisible(false)}
+        okText="创建"
+        cancelText="取消"
+        width={600}
+      >
+        <Form
+          form={addForm}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <Form.Item
+            name="title"
+            label="任务标题"
+            rules={[{ required: true, message: '请输入任务标题' }]}
+          >
+            <Input placeholder="请输入任务标题" />
+          </Form.Item>
+          
+          <Form.Item
+            name="description"
+            label="任务描述"
+          >
+            <TextArea 
+              placeholder="请输入任务描述（可选）" 
+              rows={3}
+            />
+          </Form.Item>
+          
+          <Form.Item
+            name="content"
+            label="详细内容"
+          >
+            <TextArea 
+              placeholder="请输入详细内容（可选）" 
+              rows={4}
+            />
+          </Form.Item>
+          
+          <Form.Item
+            name="priority"
+            label="优先级"
+            initialValue="medium"
+          >
+            <Select>
+              <Option value="low">低</Option>
+              <Option value="medium">中</Option>
+              <Option value="high">高</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 编辑任务模态框 */}
+      <Modal
+        title="编辑任务"
+        open={isEditModalVisible}
+        onOk={handleEditTaskSubmit}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setEditingTask(null);
+        }}
+        okText="保存"
+        cancelText="取消"
+        width={600}
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          requiredMark={false}
+        >
+          <Form.Item
+            name="title"
+            label="任务标题"
+            rules={[{ required: true, message: '请输入任务标题' }]}
+          >
+            <Input placeholder="请输入任务标题" />
+          </Form.Item>
+          
+          <Form.Item
+            name="description"
+            label="任务描述"
+          >
+            <TextArea 
+              placeholder="请输入任务描述（可选）" 
+              rows={3}
+            />
+          </Form.Item>
+          
+          <Form.Item
+            name="content"
+            label="详细内容"
+          >
+            <TextArea 
+              placeholder="请输入详细内容（可选）" 
+              rows={4}
+            />
+          </Form.Item>
+          
+          <Form.Item
+            name="priority"
+            label="优先级"
+          >
+            <Select>
+              <Option value="low">低</Option>
+              <Option value="medium">中</Option>
+              <Option value="high">高</Option>
+            </Select>
+          </Form.Item>
+          
+          <Form.Item
+            name="status"
+            label="状态"
+          >
+            <Select>
+              <Option value="pending">待处理</Option>
+              <Option value="in_progress">进行中</Option>
+              <Option value="completed">已完成</Option>
+              <Option value="cancelled">已取消</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

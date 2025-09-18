@@ -11,20 +11,30 @@
 npm install
 
 # 2. 配置环境变量
-cp .env.example .env.local
+cp env.example .env.local
 
-# 3. 启动开发服务器
+# 3. 设置数据库
+npm run db:generate    # 生成 Prisma 客户端
+npm run db:push        # 创建数据库表
+npm run db:seed        # 添加测试数据（可选）
+
+# 4. 启动开发服务器
 npm run dev
 ```
 
 ## 常用命令
 
 ```bash
+# 开发
 npm run dev          # 开发服务器
 npm run build        # 构建
 npm run lint         # 代码检查
-npm run type-check   # 类型检查
-npx prisma studio    # 数据库管理
+
+# 数据库
+npm run db:generate  # 生成 Prisma 客户端
+npm run db:push      # 推送数据库变更
+npm run db:seed      # 添加种子数据
+npm run db:studio    # 打开数据库管理界面
 ```
 
 ## 项目结构

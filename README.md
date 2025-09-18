@@ -15,7 +15,8 @@
 ## 🛠️ 技术栈
 
 - **前端**: Next.js 14 + TypeScript + Ant Design
-- **后端**: Next.js API Routes + Prisma + PostgreSQL
+- **后端**: Next.js API Routes + Prisma
+- **数据库**: SQLite (开发) / PostgreSQL (生产)
 - **AI**: OpenAI GPT-4 + 向量数据库
 - **部署**: Vercel + Supabase
 
@@ -24,15 +25,20 @@
 ```bash
 # 1. 克隆项目
 git clone <repository-url>
-cd guanzhi
+cd xinze
 
 # 2. 安装依赖
 npm install
 
 # 3. 配置环境变量
-cp .env.example .env.local
+cp env.example .env.local
 
-# 4. 启动开发服务器
+# 4. 设置数据库
+npm run db:generate    # 生成 Prisma 客户端
+npm run db:push        # 创建数据库表
+npm run db:seed        # 添加测试数据（可选）
+
+# 5. 启动开发服务器
 npm run dev
 ```
 
@@ -80,9 +86,10 @@ npm run generate:css       # 生成 CSS 变量
 npm run generate:antd      # 生成 Ant Design 主题
 
 # 数据库
-npx prisma studio          # 打开数据库管理界面
-npx prisma db push         # 推送数据库变更
-npx prisma generate        # 生成 Prisma 客户端
+npm run db:generate        # 生成 Prisma 客户端
+npm run db:push           # 推送数据库变更
+npm run db:seed           # 添加种子数据
+npm run db:studio         # 打开数据库管理界面
 ```
 
 ## 🤝 贡献
